@@ -7,11 +7,14 @@ import laravel from 'laravel-vite-plugin';
 export default defineConfig({
   plugins: [
     laravel({
-            input: ['resources/js/main.jsx'], // Entry point utama
+            input: ['src/main.jsx'], // Entry point utama
             refresh: true,
+            publicDirectory: '../public',
         }),
     react(),
     tailwindcss(),
   ],
-  
+  server: {
+    host: '127.0.0.1',
+  }
 })
