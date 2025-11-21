@@ -4,7 +4,7 @@ import axios from "axios";
 import SidebarAdmin from "../../components/sidebarAdmin";
 import * as XLSX from "xlsx";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 const LIST_ENDPOINT = `${API_BASE}/api/kuesioner`;
 
 const ControllingAdmin = () => {

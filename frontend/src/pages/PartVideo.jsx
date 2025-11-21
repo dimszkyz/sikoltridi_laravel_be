@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+// PERBAIKAN 1: Ganti default port ke 8000 (Laravel)
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 export default function PartVideo() {
   const [activeTab, setActiveTab] = useState("video");
@@ -17,8 +18,10 @@ export default function PartVideo() {
 
   const fetchVideos = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/video`);
-      setVideos(res.data || []);
+      // PERBAIKAN 2: Endpoint harus jamak '/api/videos' sesuai api.php
+      const res = await axios.get(`${API_BASE}/api/videos`);
+      // PERBAIKAN 3: Ambil data dari res.data.data (karena Laravel membungkusnya dalam object 'data')
+      setVideos(res.data.data || []);
     } catch (err) {
       console.error("Gagal mengambil video:", err);
     }
@@ -27,7 +30,8 @@ export default function PartVideo() {
   const fetchFotos = async () => {
     try {
       const res = await axios.get(`${API_BASE}/api/foto`);
-      setFotos(res.data || []);
+      // PERBAIKAN 3: Sama, ambil dari res.data.data
+      setFotos(res.data.data || []);
     } catch (err) {
       console.error("Gagal mengambil foto:", err);
     }

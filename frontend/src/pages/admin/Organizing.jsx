@@ -6,7 +6,7 @@ import { FaPlus, FaTrash, FaFilePdf } from "react-icons/fa";
 import AddOrganizing from "./AddOrganizing"; // tetap gunakan modal upload yang sama
 import PdfThumb from "../../components/PdfThumb";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 const LIST_ENDPOINT = `${API_BASE}/api/organizing`;
 const DELETE_ENDPOINT = (id) => `${API_BASE}/api/organizing/${id}`;
 const PDF_URL = (filename) => `${API_BASE}/uploads/organizing/${filename}`;

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+// PERBAIKAN 1: Definisikan API_BASE ke port 8000
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
 const Partfile = () => {
     const [files, setFiles] = useState([]);
     const [error, setError] = useState(null);
@@ -8,8 +11,10 @@ const Partfile = () => {
     useEffect(() => {
         const fetchFiles = async () => {
             try {
-                const response = await axios.get("http://localhost:5000/api/files");
-                setFiles(response.data.data);
+                // PERBAIKAN 2: Gunakan API_BASE dan endpoint '/api/file' (bukan files)
+                const response = await axios.get(`${API_BASE}/api/file`);
+                // PERBAIKAN 3: Akses data lewat res.data.data
+                setFiles(response.data.data || []);
             } catch (err) {
                 setError("Gagal memuat data file. Pastikan server backend berjalan.");
                 console.error("Error fetching files:", err);
@@ -20,7 +25,8 @@ const Partfile = () => {
     }, []);
 
     const handleOpenPDF = (pdfFile) => {
-        window.open(`http://localhost:5000/uploads/files/${pdfFile}`, "_blank");
+        // PERBAIKAN 4: Gunakan API_BASE untuk URL file
+        window.open(`${API_BASE}/uploads/files/${pdfFile}`, "_blank");
     };
 
     return (
@@ -33,7 +39,6 @@ const Partfile = () => {
                         File Sikoltridi (MoU, Panduan Model, Buku SIKADI)
                     </p>
                 </div>
-
 
                 {error && (
                     <p className="text-red-500 bg-red-100 p-3 rounded-md">{error}</p>
@@ -50,14 +55,13 @@ const Partfile = () => {
                                 <img
                                     src={
                                         file.image_file
-                                            ? `http://localhost:5000/uploads/images/${file.image_file}`
+                                            ? `${API_BASE}/uploads/images/${file.image_file}`
                                             : "https://via.placeholder.com/100x150?text=No+Preview"
                                     }
                                     alt={file.title}
                                     className="w-full h-auto object-cover transition-transform duration-300 group-hover:scale-105"
                                 />
 
-                                {/* Judul muncul dari bawah saat hover */}
                                 <div className="absolute left-1/2 bottom-[15px] transform -translate-x-1/2 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                                     <div className="bg-black/70 px-3 py-[5px] rounded-full">
                                         <h3 className="text-white text-sm font-semibold text-center whitespace-nowrap">

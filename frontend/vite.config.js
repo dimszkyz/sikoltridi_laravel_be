@@ -1,3 +1,4 @@
+// File: frontend/vite.config.js
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -7,10 +8,10 @@ import laravel from 'laravel-vite-plugin';
 export default defineConfig({
   plugins: [
     laravel({
-            input: ['src/main.jsx'], // Entry point utama
-            refresh: true,
-            publicDirectory: '../public',
-        }),
+        input: ['src/main.jsx'], 
+        refresh: true,
+        publicDirectory: '../sikoltridi-laravel/public', 
+    }),
     react(),
     tailwindcss(),
   ],

@@ -16,7 +16,7 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 const FILE_ENDPOINT = `${API_BASE}/api/files`;
 const USER_ENDPOINT = `${API_BASE}/api/users/list-user`;
 const PLANNING_ENDPOINT = `${API_BASE}/api/planning`; // endpoint planning
