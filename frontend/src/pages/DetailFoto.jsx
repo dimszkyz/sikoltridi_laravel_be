@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import Navbar from "../components/navbar"; // <-- Impor Navbar
+import Navbar from "../components/navbar";
 
 const DetailFoto = () => {
   const { id } = useParams();
@@ -24,11 +24,11 @@ const DetailFoto = () => {
         const fotoResponse = await axios.get(`${API_BASE}/api/foto/${id}`);
         setFoto(fotoResponse.data);
 
-        // Ambil komentar berdasarkan id_foto
+        // Ambil komentar
         const komentarResponse = await axios.get(`${API_BASE}/api/komentar-foto/${id}`);
         setComments(komentarResponse.data.data || []);
       } catch (err) {
-        console.error("Gagal memuat data foto atau komentar:", err);
+        console.error("Gagal memuat data:", err);
         setError("Gagal memuat detail foto atau komentar.");
       } finally {
         setLoading(false);
@@ -38,7 +38,6 @@ const DetailFoto = () => {
     fetchFotoAndComments();
   }, [id]);
 
-  // === Kirim komentar baru ===
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -51,14 +50,30 @@ const DetailFoto = () => {
     }
 
     try {
-      const response = await axios.post(`${API_BASE}/api/komentar-foto`, {
-        id_foto: id,
-        id_user: userId,
-        isi_komentar: newComment,
-      });
+      const token = localStorage.getItem("token");
+      const response = await axios.post(
+        `${API_BASE}/api/komentar-foto`, 
+        {
+          id_foto: id,
+          id_user: userId,
+          isi_komentar: newComment,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
 
-      // Tambahkan komentar baru di atas daftar
-      setComments([response.data.data, ...comments]);
+      // Update UI komentar
+      const newCommentData = response.data.data || {
+          id: Date.now(),
+          id_foto: id,
+          id_user: userId,
+          isi_komentar: newComment,
+          tanggal: new Date().toISOString(),
+          username: user.username
+      };
+
+      setComments([newCommentData, ...comments]);
       setNewComment("");
     } catch (err) {
       console.error("Gagal mengirim komentar:", err);
@@ -69,7 +84,7 @@ const DetailFoto = () => {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen bg-gray-100">
-        <p className="text-lg text-gray-600">Memuat foto dan komentar...</p>
+        <p className="text-lg text-gray-600">Memuat foto...</p>
       </div>
     );
   }
@@ -90,24 +105,31 @@ const DetailFoto = () => {
     );
   }
 
-  const formattedDate = new Date(foto.uploaded_at).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+  const formattedDate = foto.uploaded_at 
+    ? new Date(foto.uploaded_at).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })
+    : "-";
 
   return (
     <>
-      <Navbar /> {/* <-- Tambahkan Navbar di sini */}
-      {/* Tambahkan pt-24 agar konten tidak tertutup navbar */}
+      <Navbar />
       <div className="bg-gray-50 min-h-screen pt-24 py-10 px-4 sm:px-6 lg:px-8 pb-28">
         <div className="max-w-4xl mx-auto space-y-6">
+          
           {/* === Foto Utama === */}
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            {/* PERBAIKAN: Gunakan langsung foto.image_file karena backend sudah mengirim Full URL */}
             <img
-              src={`${API_BASE}/uploads/images/${foto.image_file}`}
+              src={foto.image_file} 
               alt={foto.title}
               className="w-full object-contain max-h-[70vh] bg-gray-100"
+              onError={(e) => {
+                // Fallback jika URL dari backend ternyata masih relatif (belum http)
+                if (!e.target.src.includes('http')) {
+                   e.target.src = `${API_BASE}/uploads/foto/${foto.image_file}`;
+                } else {
+                   e.target.src = "https://via.placeholder.com/800x600?text=Gagal+Muat+Gambar";
+                }
+              }}
             />
           </div>
 
@@ -116,15 +138,13 @@ const DetailFoto = () => {
             <h1 className="text-2xl sm:text-3xl font-semibold text-gray-900 mb-2">{foto.title}</h1>
             <div className="flex items-center text-gray-500 text-sm mb-3">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                <path
-                  fillRule="evenodd"
-                  d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                  clipRule="evenodd"
-                />
+                <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
               </svg>
               <span>Diupload pada {formattedDate}</span>
             </div>
-            <p className="text-gray-700 leading-relaxed">{foto.deskripsi_image}</p>
+            <p className="text-gray-700 leading-relaxed">
+              {foto.deskripsi_image || "Tidak ada deskripsi."}
+            </p>
           </div>
 
           {/* === Komentar === */}
@@ -133,47 +153,37 @@ const DetailFoto = () => {
               Komentar ({comments.length})
             </h2>
 
-          {comments.length > 0 ? (
-            <div className="space-y-4">
-              {comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="bg-gray-100 p-4 rounded-lg border border-gray-200"
-                >
-                  <div className="flex justify-between items-center mb-1">
-                    <p className="font-semibold text-gray-800">
-                      {comment.username}{" "}
+            {comments.length > 0 ? (
+              <div className="space-y-4">
+                {comments.map((comment, idx) => (
+                  <div key={comment.id || idx} className="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                    <div className="flex justify-between items-center mb-1">
+                      <p className="font-semibold text-gray-800">
+                        {comment.username || "Pengguna"}
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        {comment.tanggal ? new Date(comment.tanggal).toLocaleString("id-ID") : "Baru saja"}
+                      </span>
+                    </div>
+                    <p className="text-gray-700 text-sm break-words">
+                      {comment.isi_komentar}
                     </p>
-                    <span className="text-xs text-gray-500">
-                      {new Date(comment.tanggal).toLocaleString("id-ID")}
-                    </span>
                   </div>
-                  <p className="text-gray-700 text-sm break-words">
-                    {comment.isi_komentar}
-                  </p>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 italic">Belum ada komentar.</p>
-          )}
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500 italic">Belum ada komentar.</p>
+            )}
+          </div>
         </div>
-      </div>
 
         {/* === Input Komentar === */}
         <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-300 shadow-lg py-3 px-4">
-          <form
-            onSubmit={handleCommentSubmit}
-            className="max-w-4xl mx-auto flex items-center space-x-3"
-          >
+          <form onSubmit={handleCommentSubmit} className="max-w-4xl mx-auto flex items-center space-x-3">
             <textarea
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              placeholder={
-                user
-                  ? `Tulis komentar sebagai ${user.username}...`
-                  : "Login untuk menulis komentar..."
-              }
+              placeholder={user ? `Tulis komentar sebagai ${user.username}...` : "Login untuk menulis komentar..."}
               className="w-full p-2 border border-gray-300 rounded-lg focus:ring-gray-400 focus:border-gray-400 text-gray-800 bg-gray-50 resize-none"
               rows="1"
               disabled={!user}

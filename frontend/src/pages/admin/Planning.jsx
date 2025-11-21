@@ -46,12 +46,28 @@ const Planning = () => {
     if (!row?.id) return;
     const ok = confirm(`Hapus dokumen "${row.title}"?`);
     if (!ok) return;
+
     try {
-      await axios.delete(DELETE_ENDPOINT(row.id), { withCredentials: true });
+      // --- PERBAIKAN: Ambil Token & Kirim di Header ---
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Sesi habis atau Anda belum login. Silakan login ulang.");
+        return;
+      }
+
+      await axios.delete(DELETE_ENDPOINT(row.id), { 
+        headers: {
+            Authorization: `Bearer ${token}`
+        },
+        withCredentials: true 
+      });
+
       setRows((prev) => prev.filter((x) => x.id !== row.id));
+      alert("Data berhasil dihapus.");
     } catch (err) {
       console.error(err);
-      alert("Gagal menghapus data.");
+      const msg = err.response?.data?.message || "Gagal menghapus data.";
+      alert(msg);
     }
   };
 

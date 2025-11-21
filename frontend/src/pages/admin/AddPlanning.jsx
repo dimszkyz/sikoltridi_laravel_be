@@ -1,4 +1,3 @@
-// src/pages/admin/AddPlanning.jsx
 import React, { useRef, useState } from "react";
 import axios from "axios";
 
@@ -27,20 +26,34 @@ export default function AddPlanning({ open, onClose, onSuccess }) {
 
         const fd = new FormData();
         fd.append("title", title.trim());
-        // Tidak ada lagi image_file. Hanya PDF.
         fd.append("pdf_file", pdfFile);
 
         setSubmitting(true);
         try {
+            // --- PERBAIKAN: AMBIL TOKEN DARI LOCALSTORAGE ---
+            const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Sesi habis atau Anda belum login. Silakan login ulang.");
+                setSubmitting(false);
+                return;
+            }
+
+            // Kirim Token di Header
             await axios.post(CREATE_ENDPOINT, fd, {
-                withCredentials: true,
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Authorization": `Bearer ${token}`, // Header Wajib untuk Sanctum
+                },
             });
+
             resetForm();
             onClose?.();
             onSuccess?.(); // refresh tabel parent
+            alert("Berhasil mengunggah data planning!");
         } catch (err) {
             console.error(err);
-            alert("Gagal mengunggah data planning.");
+            const msg = err.response?.data?.message || "Gagal mengunggah data planning.";
+            alert(msg);
         } finally {
             setSubmitting(false);
         }
@@ -59,7 +72,7 @@ export default function AddPlanning({ open, onClose, onSuccess }) {
             {/* modal */}
             <div className="absolute left-1/2 top-1/2 w-[92vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-xl">
                 <div className="border-b px-6 py-4 flex items-center justify-between">
-                    <h2 className="text-lg font-medium">Upload</h2>
+                    <h2 className="text-lg font-medium">Upload Dokumen Planning</h2>
                     <button
                         onClick={() => {
                             resetForm();

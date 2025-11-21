@@ -2,7 +2,8 @@ import React, { useRef, useState } from "react";
 import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
-const CREATE_ENDPOINT = `${API_BASE}/api/video`;
+// PERBAIKAN 1: Gunakan endpoint jamak 'videos' sesuai api.php
+const CREATE_ENDPOINT = `${API_BASE}/api/videos`;
 
 export default function AddVideo({ open, onClose, onSuccess }) {
   const [judul, setJudul] = useState("");
@@ -33,18 +34,35 @@ export default function AddVideo({ open, onClose, onSuccess }) {
     const fd = new FormData();
     fd.append("judul", judul.trim());
     fd.append("keterangan", keterangan.trim());
-    fd.append("media", media);
-    if (thumbnail) fd.append("thumbnail", thumbnail);
+    fd.append("video_file", media); // PERBAIKAN NAMA FIELD: Sesuaikan dengan controller (video_file)
+    if (thumbnail) fd.append("thumbnail_file", thumbnail); // PERBAIKAN NAMA FIELD: Sesuaikan dengan controller
 
     setSubmitting(true);
     try {
-      await axios.post(CREATE_ENDPOINT, fd, { withCredentials: true });
+      // PERBAIKAN 2: Ambil Token
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Sesi habis atau Anda belum login. Silakan login ulang.");
+        setSubmitting(false);
+        return;
+      }
+
+      // PERBAIKAN 3: Kirim Header Authorization
+      await axios.post(CREATE_ENDPOINT, fd, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
       resetForm();
       onClose?.();
       onSuccess?.();
+      alert("Video berhasil diunggah!");
     } catch (err) {
       console.error(err);
-      alert("Gagal mengunggah video.");
+      const msg = err.response?.data?.message || "Gagal mengunggah video.";
+      alert(msg);
     } finally {
       setSubmitting(false);
     }

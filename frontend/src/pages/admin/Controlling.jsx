@@ -1,4 +1,3 @@
-// src/pages/admin/Controlling.jsx
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import SidebarAdmin from "../../components/sidebarAdmin";
@@ -14,12 +13,32 @@ const ControllingAdmin = () => {
 
   // === Ambil data dari backend ===
   const fetchData = async () => {
+    setLoading(true);
     try {
-      const response = await axios.get(LIST_ENDPOINT);
-      setData(response.data || []);
+      // --- PERBAIKAN UTAMA: Ambil Token ---
+      const token = localStorage.getItem("token");
+      
+      // Jika token tidak ada (misal belum login), request pasti 401
+      // Bisa ditambahkan redirect ke login jika mau, tapi di sini kita biarkan axios menangani errornya
+      
+      const response = await axios.get(LIST_ENDPOINT, {
+        headers: {
+          Authorization: `Bearer ${token}`, // Kirim Token di Header
+        },
+      });
+
+      // Laravel biasanya membungkus response dalam { data: [...] }
+      // Kita handle kedua kemungkinan (langsung array atau terbungkus)
+      const responseData = response.data.data || (Array.isArray(response.data) ? response.data : []);
+      setData(responseData);
+
     } catch (err) {
       console.error("Gagal ambil data:", err);
-      setError("Gagal memuat data controlling. Pastikan server backend aktif.");
+      if (err.response && err.response.status === 401) {
+        setError("Sesi telah habis. Silakan login kembali.");
+      } else {
+        setError("Gagal memuat data controlling. Pastikan server backend aktif.");
+      }
     } finally {
       setLoading(false);
     }
@@ -104,49 +123,65 @@ const ControllingAdmin = () => {
             {/* Judul + Tombol di sebelah kanan */}
             <div className="flex items-center justify-between mb-4 sticky top-0 bg-white z-10 pb-2">
               <h2 className="text-lg font-semibold text-blue-700">
-                Data Controlling
+                Laporan Kuesioner
               </h2>
-              <button
-                onClick={exportToExcel}
-                className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg shadow"
-              >
-                Export ke Excel
-              </button>
+              <div className="flex gap-2">
+                <button
+                    onClick={fetchData}
+                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow text-sm"
+                >
+                    Refresh Data
+                </button>
+                <button
+                    onClick={exportToExcel}
+                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg shadow text-sm"
+                >
+                    Export ke Excel
+                </button>
+              </div>
             </div>
 
             {/* Status loading/error */}
             {loading && (
-              <p className="text-gray-500 text-sm italic">Memuat data...</p>
+              <div className="text-center py-8">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                  <p className="text-gray-500 text-sm mt-2">Memuat data...</p>
+              </div>
             )}
+            
             {error && (
-              <p className="text-red-600 bg-red-50 border border-red-200 rounded p-3 mb-4">
+              <p className="text-red-600 bg-red-50 border border-red-200 rounded p-3 mb-4 text-center">
                 {error}
               </p>
             )}
 
             {/* === Tabel Data === */}
             {!loading && !error && (
-              <div className="overflow-x-auto">
-                <table className="min-w-full border border-gray-200 text-sm text-gray-800">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="border px-3 py-2 text-center">No</th>
-                      <th className="border px-3 py-2">Nama</th>
-                      <th className="border px-3 py-2">Jabatan</th>
-                      <th className="border px-3 py-2">Lembaga</th>
-                      {columns.slice(3).map((col) => (
-                        <th
-                          key={col}
-                          className="border px-3 py-2 text-center whitespace-nowrap"
-                        >
-                          {col}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>{tableRows}</tbody>
-                </table>
-              </div>
+              data.length === 0 ? (
+                  <p className="text-center text-gray-500 py-8 italic">Belum ada data kuesioner yang masuk.</p>
+              ) : (
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full border border-gray-200 text-sm text-gray-800">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="border px-3 py-2 text-center">No</th>
+                          <th className="border px-3 py-2">Nama</th>
+                          <th className="border px-3 py-2">Jabatan</th>
+                          <th className="border px-3 py-2">Lembaga</th>
+                          {columns.slice(3).map((col) => (
+                            <th
+                              key={col}
+                              className="border px-3 py-2 text-center whitespace-nowrap uppercase text-xs"
+                            >
+                              {col}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>{tableRows}</tbody>
+                    </table>
+                  </div>
+              )
             )}
           </div>
         </main>

@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Navbar from '../components/navbar'; // <-- Impor Navbar
+import Navbar from '../components/navbar';
+
+// 1. Definisi URL Backend Laravel
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 const DetailVideo = () => {
   const { id } = useParams();
@@ -20,11 +23,16 @@ const DetailVideo = () => {
     const fetchVideoAndComments = async () => {
       try {
         setLoading(true);
-        const videoResponse = await axios.get(`http://localhost:5000/api/videos/${id}`);
-        setVideo(videoResponse.data);
+        
+        // 2. Perbaiki Endpoint GET Video (Jamak)
+        const videoResponse = await axios.get(`${API_BASE}/api/videos/${id}`);
+        // Laravel membungkus detail dalam { data: ... }
+        setVideo(videoResponse.data.data || videoResponse.data);
 
-        const commentsResponse = await axios.get(`http://localhost:5000/api/komentar/${id}`);
+        // 3. Perbaiki Endpoint GET Komentar (komentar-video)
+        const commentsResponse = await axios.get(`${API_BASE}/api/komentar-video/${id}`);
         setComments(commentsResponse.data);
+        
       } catch (err) {
         console.error("Error fetching details:", err);
         setError('Gagal memuat detail video atau komentar.');
@@ -36,7 +44,6 @@ const DetailVideo = () => {
     fetchVideoAndComments();
   }, [id]);
 
-  // ✅ Perbaikan logika kirim komentar
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
     if (!newComment.trim()) return;
@@ -50,17 +57,47 @@ const DetailVideo = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/api/komentar', {
+      // 4. Perbaiki logic POST Komentar
+      // - Gunakan endpoint /api/komentar-video
+      // - Ambil Token dari localStorage
+      // - Kirim Token di Header
+      const token = localStorage.getItem('token');
+      
+      const response = await axios.post(`${API_BASE}/api/komentar-video`, {
+        id_video: id,
+        // id_user tidak perlu dikirim manual jika backend pakai Auth::user(), 
+        // tapi jika backend Anda masih butuh 'id_user', biarkan saja.
+        id_user: userId, 
+        isi_komentar: newComment,
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      // Perbarui state komentar (tambah komentar baru ke atas/bawah)
+      // response.data biasanya { message: "...", data: { ...komentar_baru... } }
+      // Kita perlu cek format respon backend Anda.
+      // Jika backend hanya return { message: "..." }, Anda harus refresh manual atau backend harus return data komentar.
+      // Asumsi backend return standard Laravel resource.
+      
+      // Agar aman, kita fetch ulang atau append manual
+      // Append manual sederhana:
+      const newCommentData = {
+        id: Date.now(), // temp id
         id_video: id,
         id_user: userId,
         isi_komentar: newComment,
-      });
-
-      setComments([response.data, ...comments]);
+        tanggal: new Date().toISOString(),
+        username: user.username
+      };
+      
+      setComments([newCommentData, ...comments]);
       setNewComment('');
+      
     } catch (err) {
       console.error('Gagal mengirim komentar:', err);
-      alert('Terjadi kesalahan saat mengirim komentar.');
+      alert('Terjadi kesalahan saat mengirim komentar. Pastikan Anda sudah Login.');
     }
   };
 
@@ -92,16 +129,26 @@ const DetailVideo = () => {
     day: 'numeric', month: 'long', year: 'numeric',
   });
 
+  // 5. URL Media yang Benar
+  const videoSrc = `${API_BASE}/uploads/video/${video.media}`;
+  const thumbSrc = video.thumbnail ? `${API_BASE}/uploads/video/thumb/${video.thumbnail}` : null;
+
   return (
     <>
-      <Navbar /> {/* <-- Tambahkan Navbar di sini */}
-      {/* Tambahkan pt-24 agar konten tidak tertutup navbar */}
+      <Navbar />
       <div className="bg-gray-50 min-h-screen pt-24 py-10 px-4 sm:px-6 lg:px-8 pb-28">
         <div className="max-w-4xl mx-auto space-y-6">
+          
           {/* === Video Player === */}
           <div className="bg-black rounded-xl shadow-lg overflow-hidden">
-            <video className="w-full aspect-video" controls poster={video.thumbnail} key={video.id}>
-              <source src={video.media} type="video/mp4" />
+            <video 
+              className="w-full aspect-video" 
+              controls 
+              poster={thumbSrc} 
+              key={video.id}
+            >
+              {/* Gunakan URL absolut ke Backend */}
+              <source src={videoSrc} type="video/mp4" />
               Browser Anda tidak mendukung tag video.
             </video>
           </div>
@@ -126,14 +173,14 @@ const DetailVideo = () => {
 
             {comments.length > 0 ? (
               <div className="space-y-4">
-                {comments.map((comment) => (
-                  <div key={comment.id} className="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                {comments.map((comment, idx) => (
+                  <div key={comment.id || idx} className="bg-gray-100 p-4 rounded-lg border border-gray-200">
                     <div className="flex justify-between items-center mb-1">
                       <p className="font-semibold text-gray-800">
-                        {comment.username}{' '}
+                        {comment.username || "Pengguna"}{' '}
                       </p>
                       <span className="text-xs text-gray-500">
-                        {new Date(comment.tanggal).toLocaleString('id-ID')}
+                        {comment.tanggal ? new Date(comment.tanggal).toLocaleString('id-ID') : "Baru saja"}
                       </span>
                     </div>
                     <p className="text-gray-700 text-sm break-words">{comment.isi_komentar}</p>
@@ -141,7 +188,7 @@ const DetailVideo = () => {
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 italic">Belum ada komentar.</p>
+              <p className="text-gray-500 italic">Belum ada komentar. Jadilah yang pertama berkomentar!</p>
             )}
           </div>
         </div>

@@ -20,6 +20,7 @@ const Foto = () => {
     setError(null);
     try {
       const res = await axios.get(LIST_ENDPOINT, { withCredentials: true });
+      // Backend mengembalikan array langsung, jadi kita cek res.data
       const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
       setRows(data);
     } catch (err) {
@@ -36,11 +37,19 @@ const Foto = () => {
 
   const handleDelete = async (row) => {
     if (!row?.id) return;
-    const ok = confirm(`Hapus foto "${row.judul}"?`);
+    // Gunakan title atau judul sebagai konfirmasi
+    const ok = confirm(`Hapus foto "${row.title || row.judul}"?`);
     if (!ok) return;
+    
     try {
-      await axios.delete(DELETE_ENDPOINT(row.id), { withCredentials: true });
+      // Ambil Token untuk keamanan
+      const token = localStorage.getItem("token");
+      await axios.delete(DELETE_ENDPOINT(row.id), { 
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true 
+      });
       setRows((prev) => prev.filter((x) => x.id !== row.id));
+      alert("Foto berhasil dihapus.");
     } catch (err) {
       console.error(err);
       alert("Gagal menghapus foto.");
@@ -50,22 +59,41 @@ const Foto = () => {
   const bodyRows = useMemo(
     () =>
       rows.map((item, index) => {
-        const imgSrc = IMAGE_URL(item.foto);
+        // PERBAIKAN 1: Gunakan 'image_file' sesuai database, bukan 'foto'
+        const imgSrc = item.image_file ? IMAGE_URL(item.image_file) : null;
+        
         return (
           <tr key={item.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
             <td className="px-4 py-3 text-sm text-gray-800">{index + 1}</td>
-            <td className="px-4 py-3 text-sm text-gray-800">{item.judul || "-"}</td>
+            {/* Backend mengirim 'title', tapi kita support 'judul' juga untuk jaga-jaga */}
+            <td className="px-4 py-3 text-sm text-gray-800">{item.title || item.judul || "-"}</td>
             <td className="px-4 py-3 text-sm text-gray-800">
-              <img src={imgSrc} alt={item.judul} className="w-28 rounded border" />
+              {imgSrc ? (
+                <img 
+                  src={imgSrc} 
+                  alt={item.title} 
+                  className="w-28 h-20 object-cover rounded border"
+                  onError={(e) => { e.target.style.display = 'none'; }} 
+                />
+              ) : (
+                <span className="text-gray-400 text-xs">No Image</span>
+              )}
             </td>
             <td className="px-4 py-3 text-sm text-gray-800">
-              {item.tanggal ? new Date(item.tanggal).toLocaleDateString("id-ID") : "-"}
+              {/* Gunakan uploaded_at karena di backend memakai itu */}
+              {item.uploaded_at 
+                ? new Date(item.uploaded_at).toLocaleDateString("id-ID") 
+                : (item.tanggal ? new Date(item.tanggal).toLocaleDateString("id-ID") : "-")
+              }
             </td>
-            <td className="px-4 py-3 text-sm text-gray-800">{item.deskripsi || "-"}</td>
+            {/* PERBAIKAN 2: Gunakan 'deskripsi_image' sesuai database, bukan 'deskripsi' */}
+            <td className="px-4 py-3 text-sm text-gray-800 max-w-xs truncate" title={item.deskripsi_image}>
+                {item.deskripsi_image || item.deskripsi || "-"}
+            </td>
             <td className="px-4 py-3 text-sm font-medium">
               <button
                 onClick={() => handleDelete(item)}
-                className="text-red-600 hover:text-red-900 rounded p-2 hover:bg-red-50"
+                className="text-red-600 hover:text-red-900 rounded p-2 hover:bg-red-50 transition"
                 title="Hapus"
               >
                 <FaTrash size={16} />
@@ -81,34 +109,34 @@ const Foto = () => {
     <div className="flex min-h-screen bg-gray-100">
       <SidebarAdmin />
 
-      <div className="flex-1 flex flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between bg-white/80 backdrop-blur border-b px-4 py-3">
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <header className="sticky top-0 z-10 flex items-center justify-between bg-white/80 backdrop-blur border-b px-4 py-3 shadow-sm">
           <h1 className="text-xl md:text-2xl font-semibold text-gray-800 flex items-center gap-2">
-            <FaImage className="text-blue-600" /> Foto
+            <FaImage className="text-blue-600" /> Manajemen Foto
           </h1>
           <button
             onClick={() => setOpenModal(true)}
-            className="hidden md:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 active:scale-[0.99] transition"
+            className="hidden md:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 active:scale-[0.99] transition shadow"
           >
             <FaPlus /> Tambah Foto
           </button>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 space-y-4">
+        <main className="flex-1 p-4 md:p-6 space-y-4 overflow-y-auto">
           {error && (
-            <p className="text-red-600 bg-red-50 border border-red-200 px-4 py-2 rounded">
+            <p className="text-red-600 bg-red-50 border border-red-200 px-4 py-3 rounded shadow-sm">
               {error}
             </p>
           )}
 
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="p-4 md:p-6 overflow-x-auto">
+            <div className="p-0 overflow-x-auto">
               {loading ? (
-                <div className="grid place-items-center h-48 text-gray-500">Memuat data…</div>
+                <div className="grid place-items-center h-48 text-gray-500">Memuat data...</div>
               ) : rows.length === 0 ? (
                 <div className="grid place-items-center h-48 text-gray-500">Belum ada foto.</div>
               ) : (
-                <table className="min-w-full border">
+                <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">No</th>
@@ -130,7 +158,7 @@ const Foto = () => {
       {/* FAB Mobile */}
       <button
         onClick={() => setOpenModal(true)}
-        className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg grid place-items-center active:scale-95"
+        className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg grid place-items-center active:scale-95 z-50"
       >
         <FaPlus />
       </button>

@@ -6,6 +6,7 @@ use App\Models\KomentarFoto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class KomentarFotoController extends Controller
 {
     // Mengambil semua komentar untuk foto tertentu

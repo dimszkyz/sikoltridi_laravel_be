@@ -1,9 +1,8 @@
-// src/pages/admin/AddOrganizing.jsx
 import React, { useRef, useState } from "react";
 import axios from "axios";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
-const CREATE_ENDPOINT = `${API_BASE}/api/organizing`; // 🔹 endpoint khusus Organizing
+const CREATE_ENDPOINT = `${API_BASE}/api/organizing`;
 
 export default function AddOrganizing({ open, onClose, onSuccess }) {
   const [title, setTitle] = useState("");
@@ -27,17 +26,34 @@ export default function AddOrganizing({ open, onClose, onSuccess }) {
 
     const fd = new FormData();
     fd.append("title", title.trim());
-    fd.append("pdf_file", pdfFile); // hanya PDF, tidak ada image
+    fd.append("pdf_file", pdfFile);
 
     setSubmitting(true);
     try {
-      await axios.post(CREATE_ENDPOINT, fd, { withCredentials: true });
+      // --- PERBAIKAN: AMBIL TOKEN ---
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Sesi habis atau Anda belum login. Silakan login ulang.");
+        setSubmitting(false);
+        return;
+      }
+
+      // Kirim Token di Header
+      await axios.post(CREATE_ENDPOINT, fd, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`, // Header Wajib untuk Sanctum
+        },
+      });
+
       resetForm();
       onClose?.();
       onSuccess?.(); // refresh tabel parent (Organizing.jsx)
+      alert("Berhasil mengunggah data organizing!");
     } catch (err) {
       console.error(err);
-      alert("Gagal mengunggah data organizing.");
+      const msg = err.response?.data?.message || "Gagal mengunggah data organizing.";
+      alert(msg);
     } finally {
       setSubmitting(false);
     }

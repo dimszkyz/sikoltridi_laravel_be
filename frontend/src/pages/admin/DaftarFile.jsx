@@ -3,7 +3,7 @@ import axios from "axios";
 import SidebarAdmin from "../../components/sidebarAdmin";
 import { FaPlus, FaTrash, FaFilePdf } from "react-icons/fa";
 import PdfThumb from "../../components/PdfThumb";
-import AddFile from "./AddFile"; // 🔹 modal baru
+import AddFile from "./AddFile"; 
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 const LIST_ENDPOINT = `${API_BASE}/api/files`;
@@ -21,7 +21,9 @@ const DaftarFile = () => {
     setError(null);
     try {
       const response = await axios.get(LIST_ENDPOINT);
-      setFiles(response.data?.data || []);
+      // Handle format response Laravel { data: [...] }
+      const data = response.data.data || (Array.isArray(response.data) ? response.data : []);
+      setFiles(data);
     } catch (err) {
       setError("Gagal mengambil data file. Pastikan server backend berjalan.");
       console.error(err);
@@ -48,13 +50,27 @@ const DaftarFile = () => {
 
   const handleDelete = async (id, title) => {
     if (!window.confirm(`Yakin ingin menghapus file "${title}"?`)) return;
+    
     try {
-      await axios.delete(DELETE_ENDPOINT(id));
+      // --- PERBAIKAN: Ambil Token & Kirim di Header ---
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Anda tidak memiliki akses atau sesi habis. Silakan login.");
+        return;
+      }
+
+      await axios.delete(DELETE_ENDPOINT(id), {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
       alert("File berhasil dihapus!");
       fetchFiles(); // refresh data
     } catch (err) {
       console.error(err);
-      alert("Gagal menghapus file. Coba lagi.");
+      const msg = err.response?.data?.message || "Gagal menghapus file. Coba lagi.";
+      alert(msg);
     }
   };
 

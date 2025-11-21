@@ -27,19 +27,39 @@ export default function AddFoto({ open, onClose, onSuccess }) {
     if (!foto) return alert("File foto wajib diunggah.");
 
     const fd = new FormData();
-    fd.append("judul", judul.trim());
-    fd.append("deskripsi", deskripsi.trim());
-    fd.append("foto", foto);
+    
+    // --- PERBAIKAN DI SINI ---
+    // Backend (Controller) mengharapkan field 'title', bukan 'judul'
+    fd.append("title", judul.trim()); 
+    
+    fd.append("deskripsi_image", deskripsi.trim()); 
+    fd.append("image_file", foto);
 
     setSubmitting(true);
     try {
-      await axios.post(CREATE_ENDPOINT, fd, { withCredentials: true });
+      const token = localStorage.getItem("token");
+      if (!token) {
+        alert("Sesi habis atau Anda belum login. Silakan login ulang.");
+        setSubmitting(false);
+        return;
+      }
+
+      await axios.post(CREATE_ENDPOINT, fd, {
+        headers: {
+            "Content-Type": "multipart/form-data",
+            "Authorization": `Bearer ${token}`,
+        },
+      });
+
       resetForm();
       onClose?.();
       onSuccess?.();
+      alert("Foto berhasil diunggah!");
     } catch (err) {
       console.error(err);
-      alert("Gagal mengunggah foto.");
+      // Menampilkan pesan error spesifik dari backend jika ada (misal: validasi)
+      const msg = err.response?.data?.message || "Gagal mengunggah foto.";
+      alert(msg);
     } finally {
       setSubmitting(false);
     }
@@ -47,6 +67,7 @@ export default function AddFoto({ open, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50">
+      {/* backdrop */}
       <div
         className="absolute inset-0 bg-black/50"
         onClick={() => {
@@ -54,6 +75,7 @@ export default function AddFoto({ open, onClose, onSuccess }) {
           onClose?.();
         }}
       />
+      {/* modal */}
       <div className="absolute left-1/2 top-1/2 w-[92vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-lg bg-white shadow-xl">
         <div className="border-b px-6 py-4 flex items-center justify-between">
           <h2 className="text-lg font-medium">Upload Foto</h2>

@@ -1,17 +1,18 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
-// 1. Impor ikon
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+
+// 1. Gunakan Port Laravel
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 const Register = () => {
   const navigate = useNavigate();
   
-  // --- STATE SESUAI URUTAN BARU ---
   const [username, setUsername] = useState("");
   const [namaLengkap, setNamaLengkap] = useState("");
   const [password, setPassword] = useState("");
-  const [jabatan, setJabatan] = useState(""); // Default kosong untuk dropdown
+  const [jabatan, setJabatan] = useState(""); 
   const [nipNik, setNipNik] = useState("");
   
   const [showPassword, setShowPassword] = useState(false);
@@ -22,45 +23,43 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // Kirim semua data state ke backend
-      const res = await axios.post("http://localhost:5000/api/users/pengajuan-akun", {
+      // 2. Gunakan endpoint Laravel yang benar (/api/ajukan-akun)
+      const res = await axios.post(`${API_BASE}/api/ajukan-akun`, {
         username,
         password,
-        nama_lengkap: namaLengkap, // Pastikan key sesuai dengan backend
+        nama_lengkap: namaLengkap,
         jabatan: jabatan,
         nip_nik: nipNik,
       });
 
-      alert(res.data.msg || "Pengajuan akun berhasil, tunggu persetujuan admin!");
+      // Sesuaikan pesan sukses dengan respon Laravel
+      alert(res.data.msg || res.data.message || "Pengajuan akun berhasil, tunggu persetujuan admin!");
       navigate("/login");
     } catch (err) {
-      alert(err.response?.data?.msg || "Terjadi kesalahan saat mengajukan akun");
+      console.error("Register Error:", err);
+      // Penanganan error yang lebih aman
+      let message = "Terjadi kesalahan saat mengajukan akun";
+      if (err.response && err.response.data) {
+          message = err.response.data.msg || err.response.data.message || message;
+      }
+      alert(message);
     } finally {
       setLoading(false);
     }
   };
 
-  // Variabel untuk mengecek apakah NIP/NIK perlu ditampilkan
   const showNipNik = ['kepsek', 'guru', 'dudi'].includes(jabatan);
 
   return (
-    // Menggunakan layout flex column agar footer menempel di bawah
     <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Konten utama dibuat 'flex-grow' untuk mengisi ruang */}
       <main className="flex-grow flex items-center justify-center">
         <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
           <h2 className="text-2xl font-bold text-center text-gray-900">Daftar Akun</h2>
 
           <form onSubmit={handleRegister} className="space-y-6">
             
-            {/* 1. USERNAME */}
             <div>
-              <label 
-                htmlFor="username" 
-                className="block text-sm font-medium text-gray-700"
-              >
-                Username
-              </label>
+              <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
               <input
                 id="username"
                 type="text"
@@ -72,14 +71,8 @@ const Register = () => {
               />
             </div>
 
-            {/* 2. NAMA LENGKAP */}
             <div>
-              <label 
-                htmlFor="namaLengkap" 
-                className="block text-sm font-medium text-gray-700"
-              >
-                Nama Lengkap
-              </label>
+              <label htmlFor="namaLengkap" className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
               <input
                 id="namaLengkap"
                 type="text"
@@ -91,14 +84,8 @@ const Register = () => {
               />
             </div>
 
-            {/* 3. PASSWORD */}
             <div>
-              <label 
-                htmlFor="password" 
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
               <div className="relative mt-1">
                 <input
                   id="password"
@@ -113,23 +100,13 @@ const Register = () => {
                   className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? (
-                    <FaEyeSlash className="text-gray-500" />
-                  ) : (
-                    <FaEye className="text-gray-500" />
-                  )}
+                  {showPassword ? <FaEyeSlash className="text-gray-500" /> : <FaEye className="text-gray-500" />}
                 </div>
               </div>
             </div>
 
-            {/* 4. JABATAN (DROPDOWN) */}
             <div>
-              <label 
-                htmlFor="jabatan" 
-                className="block text-sm font-medium text-gray-700"
-              >
-                Jabatan
-              </label>
+              <label htmlFor="jabatan" className="block text-sm font-medium text-gray-700">Jabatan</label>
               <select
                 id="jabatan"
                 className="w-full px-3 py-2 mt-1 text-gray-900 bg-gray-100 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -145,15 +122,9 @@ const Register = () => {
               </select>
             </div>
 
-            {/* 5. NIP / NIK (KONDISIONAL) */}
             {showNipNik && (
               <div>
-                <label 
-                  htmlFor="nipNik" 
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  NIP / NIK
-                </label>
+                <label htmlFor="nipNik" className="block text-sm font-medium text-gray-700">NIP / NIK</label>
                 <input
                   id="nipNik"
                   type="text"
@@ -161,7 +132,7 @@ const Register = () => {
                   placeholder="Masukkan NIP/NIK Kepegawaian"
                   value={nipNik}
                   onChange={(e) => setNipNik(e.target.value)}
-                  required // NIP/NIK wajib diisi jika jabatannya dipilih
+                  required
                 />
               </div>
             )}
@@ -184,7 +155,6 @@ const Register = () => {
         </div>
       </main>
       
-      {/* Footer ditambahkan di sini */}
       <footer className="bg-white text-black text-center py-4 border-t border-gray-200">
         <p className="text-sm tracking-wide">
           © Copyright <span className="font-bold">GAZEBO TECH 2025</span> All Rights Reserved
