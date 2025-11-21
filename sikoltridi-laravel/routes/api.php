@@ -44,7 +44,7 @@ Route::get('/foto/{id}', [ActuatingFotoController::class, 'show']);
 // Planning, Organizing, Controlling (File Lists)
 Route::get('/planning', [PlanningController::class, 'index']);
 Route::get('/organizing', [OrganizingController::class, 'index']);
-Route::get('/file', [FileController::class, 'index']); // Controlling/File
+Route::get('/files', [FileController::class, 'index']); // Controlling/File
 
 // Komentar (Read)
 Route::get('/komentar-video/{id_video}', [KomentarVideoController::class, 'getByVideoId']);
@@ -92,8 +92,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/organizing/{id}', [OrganizingController::class, 'destroy']);
 
     // Controlling/File (Halaman: admin/AddFile.jsx, admin/DaftarFile.jsx)
-    Route::post('/file', [FileController::class, 'store']);
-    Route::delete('/file/{id}', [FileController::class, 'destroy']);
+    Route::post('/files', [FileController::class, 'store']);
+    Route::delete('/files/{id}', [FileController::class, 'destroy']);
 
     // 4. User Interactions (Comment)
     Route::post('/komentar-video', [KomentarVideoController::class, 'store']);

@@ -12,7 +12,7 @@ const Partfile = () => {
         const fetchFiles = async () => {
             try {
                 // PERBAIKAN 2: Gunakan API_BASE dan endpoint '/api/file' (bukan files)
-                const response = await axios.get(`${API_BASE}/api/file`);
+                const response = await axios.get(`${API_BASE}/api/files`);
                 // PERBAIKAN 3: Akses data lewat res.data.data
                 setFiles(response.data.data || []);
             } catch (err) {

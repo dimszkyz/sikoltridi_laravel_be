@@ -2,26 +2,24 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class DokumenFile extends Model
 {
-    protected $table = 'file'; // Nama tabel di SQL adalah 'file'
-    public $timestamps = false;
-    const CREATED_AT = 'uploaded_at';
-    const UPDATED_AT = null;
+    use HasFactory;
 
-    protected $fillable = ['title', 'image_file', 'pdf_file', 'uploaded_at'];
+    // PERBAIKAN PENTING: Sambungkan ke tabel 'file' yang ada di SQL
+    protected $table = 'file'; 
+    
+    // Matikan timestamps jika tabel 'file' tidak punya created_at/updated_at
+    // (Lihat SQL kamu: tabel file punya uploaded_at, tapi bukan created_at default laravel)
+    public $timestamps = false; 
 
-    protected $appends = ['pdf_url', 'image_url'];
-
-    public function getPdfUrlAttribute()
-    {
-        return $this->pdf_file ? url('uploads/files/' . $this->pdf_file) : null;
-    }
-
-    public function getImageUrlAttribute()
-    {
-        return $this->image_file ? url('uploads/images/' . $this->image_file) : null;
-    }
+    protected $fillable = [
+        'title',
+        'image_file',
+        'pdf_file',
+        'uploaded_at'
+    ];
 }

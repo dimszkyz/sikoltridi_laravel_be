@@ -3,8 +3,9 @@ import axios from "axios";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.entry";
 
+// Pastikan URL ini sesuai dengan Backend Laravel (Port 8000)
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
-const CREATE_ENDPOINT = `${API_BASE}/api/files`;
+const CREATE_ENDPOINT = `${API_BASE}/api/files`; // Menggunakan jamak 'files'
 
 export default function AddFileModal({ open, onClose, onSuccess }) {
   const [title, setTitle] = useState("");
@@ -77,15 +78,32 @@ export default function AddFileModal({ open, onClose, onSuccess }) {
 
     setSubmitting(true);
     try {
-      await axios.post(CREATE_ENDPOINT, fd);
-      resetForm();
-      onClose?.();
-      onSuccess?.();
+        // --- PERBAIKAN DI SINI: AMBIL TOKEN ---
+        // Pastikan token disimpan dengan nama 'token' di localStorage saat Login
+        const token = localStorage.getItem('token'); 
+        
+        if (!token) {
+            alert("Anda belum login atau sesi habis.");
+            return;
+        }
+
+        await axios.post(CREATE_ENDPOINT, fd, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+                'Authorization': `Bearer ${token}` // Header Wajib untuk Sanctum
+            }
+        });
+
+        resetForm();
+        onClose?.();
+        onSuccess?.();
+        alert("File berhasil diunggah!");
     } catch (err) {
-      console.error(err);
-      alert("Gagal mengunggah file.");
+        console.error(err);
+        const pesan = err.response?.data?.message || "Gagal mengunggah file.";
+        alert(pesan);
     } finally {
-      setSubmitting(false);
+        setSubmitting(false);
     }
   };
 
