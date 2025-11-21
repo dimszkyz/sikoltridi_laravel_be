@@ -7,51 +7,50 @@ use Illuminate\Http\Request;
 
 class VideoController extends Controller
 {
-    public function index()
+    public function getAllVideos()
     {
-        // Node lama mungkin mengembalikan JSON mentah. 
-        // Kita pastikan urutannya sama.
-        $videos = Video::with('uploader')->orderBy('uploaded_at', 'desc')->get();
-        return response()->json($videos);
+        try {
+            $videos = Video::all();
+
+            // Mapping hasil agar format JSON sama persis dengan Node.js
+            $results = $videos->map(function ($video) {
+                return [
+                    'id' => $video->id,
+                    'media' => url('uploads/video/' . $video->media), // Sesuaikan path
+                    'thumbnail' => url('uploads/images/' . $video->thumbnail),
+                    'tanggal' => $video->tanggal,
+                    'judul' => $video->judul,
+                    'keterangan' => $video->keterangan,
+                    // field lain jika ada
+                ];
+            });
+
+            return response()->json($results, 200);
+        } catch (\Exception $err) {
+            return response()->json([
+                'message' => 'Gagal mengambil data video',
+                'error' => $err->getMessage(),
+            ], 500);
+        }
     }
 
-    public function store(Request $request)
+    public function getVideoById($id)
     {
-        // React mengirim field bernama 'title', 'deskripsi', 'video', 'thumbnail'
-        $request->validate([
-            'title' => 'required', 
-            'video' => 'required|mimes:mp4,mov,avi|max:200000', 
-            'thumbnail' => 'nullable|image'
-        ]);
+        try {
+            $video = Video::find($id);
 
-        $videoPath = null;
-        if ($request->hasFile('video')) {
-            // Simpan file dan ambil path-nya
-            $videoPath = $request->file('video')->store('uploads/video', 'public');
+            if (!$video) {
+                return response()->json(['message' => 'Video tidak ditemukan'], 404);
+            }
+
+            // Format response single object
+            $videoData = $video->toArray();
+            $videoData['media'] = url('uploads/video/' . $video->media);
+            $videoData['thumbnail'] = url('uploads/images/' . $video->thumbnail);
+
+            return response()->json($videoData, 200);
+        } catch (\Exception $err) {
+            return response()->json(['message' => 'Gagal mengambil data video'], 500);
         }
-
-        $thumbnailPath = null;
-        if ($request->hasFile('thumbnail')) {
-            $thumbnailPath = $request->file('thumbnail')->store('uploads/video/thumb', 'public');
-        }
-
-        // PERBAIKAN: Mapping input React -> Kolom Database
-        $video = Video::create([
-            'judul' => $request->title, // Input 'title' masuk ke kolom 'judul'
-            'deskripsi' => $request->deskripsi,
-            'file_path' => $videoPath, // Input file masuk ke 'file_path'
-            'thumbnail_path' => $thumbnailPath, // Input thumb masuk ke 'thumbnail_path'
-            'upload_by' => $request->user()->id_user, 
-            'uploaded_at' => now()
-        ]);
-
-        return response()->json(['message' => 'Video berhasil diupload', 'data' => $video], 201);
-    }
-    
-    public function show($id)
-    {
-        $video = Video::with('uploader')->find($id);
-        if (!$video) return response()->json(['message' => 'Video tidak ditemukan'], 404);
-        return response()->json($video);
     }
 }

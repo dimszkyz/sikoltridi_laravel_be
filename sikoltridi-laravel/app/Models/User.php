@@ -2,25 +2,22 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, Notifiable;
 
-    // Mapping ke tabel lama
-    protected $table = 'user'; 
-    protected $primaryKey = 'id_user';
-    public $timestamps = false; // SQL lama tidak punya created_at/updated_at di tabel user
+    protected $table = 'user';        // Sesuai SQL: user
+    protected $primaryKey = 'id_user'; // Sesuai SQL: id_user
+    public $timestamps = false;       // Tabel user tidak punya created_at/updated_at
 
     protected $fillable = [
         'username',
         'password',
-        'role',
-        'nama_lengkap',
+        'level', // Sesuai SQL (admin, user, superadmin)
     ];
 
     protected $hidden = [

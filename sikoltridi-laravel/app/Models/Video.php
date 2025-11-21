@@ -3,35 +3,33 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Storage;
 
 class Video extends Model
 {
-    protected $table = 'video'; 
+    protected $table = 'video';
     public $timestamps = false; 
 
-    // PERBAIKAN: Sesuaikan dengan kolom asli di database (berdasarkan sql dump)
     protected $fillable = [
-        'judul',           // Sebelumnya: title
-        'file_path',       // Sebelumnya: video_file
-        'thumbnail_path',  // Sebelumnya: thumbnail
-        'deskripsi',
-        'upload_by',
-        'uploaded_at'
+        'media',
+        'thumbnail',
+        'tanggal',
+        'judul',
+        'keterangan'
     ];
 
-    // Optional: Accessor agar frontend React tetap bisa akses property 'video_url' jika perlu
-    protected $appends = ['video_url', 'thumbnail_url'];
+    // Tambahkan field custom ke JSON response
+    protected $appends = ['media_url', 'thumbnail_url'];
 
-    public function getVideoUrlAttribute() {
-        return url('storage/' . $this->file_path);
+    // Logika konversi URL persis seperti videoController.js Node
+    public function getMediaUrlAttribute()
+    {
+        // Asumsi file disimpan di folder public/uploads/video
+        return url('uploads/video/' . $this->media);
     }
 
-    public function getThumbnailUrlAttribute() {
-        return $this->thumbnail_path ? url('storage/' . $this->thumbnail_path) : null;
-    }
-
-    public function uploader() {
-        return $this->belongsTo(User::class, 'upload_by', 'id_user');
+    public function getThumbnailUrlAttribute()
+    {
+        // Asumsi file disimpan di folder public/uploads/images
+        return url('uploads/images/' . $this->thumbnail);
     }
 }
