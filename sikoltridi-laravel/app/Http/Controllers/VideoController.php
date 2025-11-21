@@ -4,29 +4,29 @@ namespace App\Http\Controllers;
 
 use App\Models\Video;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 
 class VideoController extends Controller
 {
     public function index()
     {
-        // Node: SELECT * FROM video JOIN user ...
+        // Node lama mungkin mengembalikan JSON mentah. 
+        // Kita pastikan urutannya sama.
         $videos = Video::with('uploader')->orderBy('uploaded_at', 'desc')->get();
         return response()->json($videos);
     }
 
     public function store(Request $request)
     {
+        // React mengirim field bernama 'title', 'deskripsi', 'video', 'thumbnail'
         $request->validate([
-            'title' => 'required',
-            'video' => 'required|mimes:mp4,mov,avi|max:200000', // Max 200MB
+            'title' => 'required', 
+            'video' => 'required|mimes:mp4,mov,avi|max:200000', 
             'thumbnail' => 'nullable|image'
         ]);
 
-        // Logic Upload (Pengganti Multer)
         $videoPath = null;
         if ($request->hasFile('video')) {
-            // Simpan ke storage/app/public/uploads/video
+            // Simpan file dan ambil path-nya
             $videoPath = $request->file('video')->store('uploads/video', 'public');
         }
 
@@ -35,12 +35,13 @@ class VideoController extends Controller
             $thumbnailPath = $request->file('thumbnail')->store('uploads/video/thumb', 'public');
         }
 
+        // PERBAIKAN: Mapping input React -> Kolom Database
         $video = Video::create([
-            'title' => $request->title,
+            'judul' => $request->title, // Input 'title' masuk ke kolom 'judul'
             'deskripsi' => $request->deskripsi,
-            'video_file' => $videoPath, // Simpan path-nya saja
-            'thumbnail' => $thumbnailPath,
-            'upload_by' => $request->user()->id_user, // Ambil ID dari token Sanctum
+            'file_path' => $videoPath, // Input file masuk ke 'file_path'
+            'thumbnail_path' => $thumbnailPath, // Input thumb masuk ke 'thumbnail_path'
+            'upload_by' => $request->user()->id_user, 
             'uploaded_at' => now()
         ]);
 

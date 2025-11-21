@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\PlanningController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 // Public Routes
 Route::post('/login', [AuthController::class, 'login']);
@@ -15,9 +16,8 @@ Route::get('/videos/{id}', [VideoController::class, 'show']);
 // Protected Routes (Harus Login)
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/videos', [VideoController::class, 'store']);
-    Route::post('/planning', [PlanningController::class, 'store']);
-    // ... Route protected lainnya
     
+    // Route ini butuh "use Illuminate\Http\Request;" di atas
     Route::get('/me', function (Request $request) {
         return $request->user();
     });
