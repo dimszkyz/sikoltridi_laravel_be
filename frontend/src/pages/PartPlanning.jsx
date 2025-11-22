@@ -3,13 +3,14 @@ import axios from "axios";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.entry";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://sikoltridi.sidome.id";
 
 // Ukuran kotak abu-abu (card) tempat thumbnail PDF
 const THUMB_W = 300;   // mengikuti w-[300px] pada card
 const THUMB_H = 400;   // mengikuti h-[400px] pada kontainer abu-abu
 
 const PartPlanning = () => {
+  // Inisialisasi state dengan array kosong
   const [files, setFiles] = useState([]);
   const [error, setError] = useState(null);
   const canvasRefs = useRef({});
@@ -18,16 +19,27 @@ const PartPlanning = () => {
     const fetchFiles = async () => {
       try {
         const res = await axios.get(`${API_BASE}/api/planning`);
-        setFiles(res.data.data);
+        
+        // PERBAIKAN: Pastikan res.data.data ada dan berupa array sebelum setFiles
+        if (res.data && Array.isArray(res.data.data)) {
+          setFiles(res.data.data);
+        } else {
+          console.warn("Format respons API tidak sesuai:", res.data);
+          setFiles([]); // Fallback ke array kosong jika data tidak valid
+        }
       } catch (err) {
         setError("Gagal memuat data planning. Pastikan server backend berjalan.");
         console.error("Error fetching planning:", err);
+        setFiles([]); // Pastikan tetap array kosong saat error
       }
     };
     fetchFiles();
   }, []);
 
   useEffect(() => {
+    // Jika files kosong atau undefined, hentikan eksekusi render thumbnail
+    if (!files || files.length === 0) return;
+
     const renderThumbnails = async () => {
       for (const file of files) {
         const canvas = canvasRefs.current[file.id];
@@ -80,12 +92,15 @@ const PartPlanning = () => {
       }
     };
 
-    if (files.length) renderThumbnails();
+    renderThumbnails();
   }, [files]);
 
   const handleOpenPDF = (pdfFile) => {
     window.open(`${API_BASE}/uploads/planning/${pdfFile}`, "_blank");
   };
+
+  // PERBAIKAN: Gunakan variabel aman untuk rendering agar tidak crash jika files undefined
+  const safeFiles = files || [];
 
   return (
     <div className="p-6">
@@ -97,46 +112,45 @@ const PartPlanning = () => {
         </div>
 
         {error && (
-          <p className="text-red-500 bg-red-100 p-3 rounded-md">{error}</p>
+          <p className="text-red-500 bg-red-100 p-3 rounded-md mb-4">{error}</p>
         )}
 
         <div
-  className={`flex flex-wrap gap-6 ${
-    files.length === 1 ? "justify-start" : "justify-center"
-  }`}
->
-  {files.length > 0 ? (
-    files.map((file) => (
-      <div
-        key={file.id}
-        className="relative overflow-hidden rounded-md shadow-md group cursor-pointer w-[300px]"
-        onClick={() => handleOpenPDF(file.pdf_file)}
-      >
-        <div className="bg-gray-200 w-full h-[400px] rounded-md overflow-hidden">
-          <canvas
-            ref={(el) => (canvasRefs.current[file.id] = el)}
-            className="block w-[300px] h-[400px]"
-          />
-        </div>
+          className={`flex flex-wrap gap-6 ${
+            safeFiles.length === 1 ? "justify-start" : "justify-center"
+          }`}
+        >
+          {safeFiles.length > 0 ? (
+            safeFiles.map((file) => (
+              <div
+                key={file.id}
+                className="relative overflow-hidden rounded-md shadow-md group cursor-pointer w-[300px]"
+                onClick={() => handleOpenPDF(file.pdf_file)}
+              >
+                <div className="bg-gray-200 w-full h-[400px] rounded-md overflow-hidden">
+                  <canvas
+                    ref={(el) => (canvasRefs.current[file.id] = el)}
+                    className="block w-[300px] h-[400px]"
+                  />
+                </div>
 
-        <div className="absolute left-1/2 bottom-[15px] -translate-x-1/2 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-          <div className="bg-black/70 px-3 py-[5px] rounded-full">
-            <h3 className="text-white text-sm font-semibold text-center whitespace-nowrap">
-              {file.title}
-            </h3>
-          </div>
+                <div className="absolute left-1/2 bottom-[15px] -translate-x-1/2 translate-y-6 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                  <div className="bg-black/70 px-3 py-[5px] rounded-full">
+                    <h3 className="text-white text-sm font-semibold text-center whitespace-nowrap">
+                      {file.title}
+                    </h3>
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            !error && (
+              <p className="text-gray-500 text-center col-span-full">
+                Tidak ada dokumen planning yang tersedia.
+              </p>
+            )
+          )}
         </div>
-      </div>
-    ))
-  ) : (
-    !error && (
-      <p className="text-gray-500 text-center col-span-full">
-        Tidak ada dokumen planning yang tersedia.
-      </p>
-    )
-  )}
-</div>
-
       </div>
     </div>
   );

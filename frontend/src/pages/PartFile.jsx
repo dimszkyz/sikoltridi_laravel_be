@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 // PERBAIKAN 1: Definisikan API_BASE ke port 8000
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://sikoltridi.sidome.id";
 
 const Partfile = () => {
     const [files, setFiles] = useState([]);
