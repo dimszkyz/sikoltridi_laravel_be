@@ -18,6 +18,9 @@ class PengajuanAkun extends Model
         'username',
         'password',
         'level',
-        'status'
+        'status',
+        'nama_lengkap', // Tambahkan ini
+        'jabatan',      // Tambahkan ini
+        'nip_nik'       // Tambahkan ini
     ];
 }

@@ -1,7 +1,7 @@
 // frontend/src/pages/admin/admin.jsx
 import React, { useEffect, useState } from "react";
 import SidebarAdmin from "../../components/sidebarAdmin";
-import { FaSearch, FaTrash, FaUsers, FaFileAlt, FaCalendarAlt, FaVideo, FaImage } from "react-icons/fa";
+import { FaUsers, FaFileAlt, FaCalendarAlt, FaVideo, FaImage } from "react-icons/fa";
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
 import {
@@ -17,50 +17,55 @@ import {
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
+// Endpoint
 const FILE_ENDPOINT = `${API_BASE}/api/files`;
-const USER_ENDPOINT = `${API_BASE}/api/users/list-user`;
-const PLANNING_ENDPOINT = `${API_BASE}/api/planning`; // endpoint planning
+const USER_ENDPOINT = `${API_BASE}/api/users-db`;
+const PLANNING_ENDPOINT = `${API_BASE}/api/planning`;
 const ORGANIZING_ENDPOINT = `${API_BASE}/api/organizing`;
-const VIDEO_ENDPOINT = `${API_BASE}/api/video`;
+const VIDEO_ENDPOINT = `${API_BASE}/api/videos`;
 const FOTO_ENDPOINT = `${API_BASE}/api/foto`;
 
 const Admin = () => {
   const [files, setFiles] = useState([]);
   const [totalFiles, setTotalFiles] = useState(0);
+  
   const [planningRows, setPlanningRows] = useState([]);
   const [totalPlanning, setTotalPlanning] = useState(0);
+  
   const [users, setUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
+  
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [totalOrganizing, setTotalOrganizing] = useState(0);
+  
   const [organizingRows, setOrganizingRows] = useState([]);
-  const [totalVideo, setTotalVideo] = useState(0);
+  const [totalOrganizing, setTotalOrganizing] = useState(0);
+  
   const [videoRows, setVideoRows] = useState([]);
-  const [totalFoto, setTotalFoto] = useState(0);
+  const [totalVideo, setTotalVideo] = useState(0);
+  
   const [fotoRows, setFotoRows] = useState([]);
+  const [totalFoto, setTotalFoto] = useState(0);
+  
   const [user, setUser] = useState(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
-
-  // Ambil data file dari backend
-  const fetchOrganizing = async () => {
-    try {
-      const res = await axios.get(ORGANIZING_ENDPOINT, { withCredentials: true });
-      const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
-      setOrganizingRows(data);
-      setTotalOrganizing(data.length);
-      return data;
-    } catch (err) {
-      console.error("Gagal memuat data organizing:", err);
-      return [];
-    }
+  const getAuthHeader = () => {
+    const token = localStorage.getItem("token");
+    return {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
   };
+
+  // --- Fetch Functions ---
 
   const fetchFiles = async () => {
     try {
-      const res = await axios.get(FILE_ENDPOINT);
-      const data = res.data?.data || [];
+      const res = await axios.get(FILE_ENDPOINT, getAuthHeader());
+      const data = res.data?.data || (Array.isArray(res.data) ? res.data : []);
       setFiles(data);
       setTotalFiles(data.length);
       return data;
@@ -70,11 +75,10 @@ const Admin = () => {
     }
   };
 
-  // Ambil data planning dari backend
   const fetchPlanning = async () => {
     try {
-      const res = await axios.get(PLANNING_ENDPOINT, { withCredentials: true });
-      const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const res = await axios.get(PLANNING_ENDPOINT, getAuthHeader());
+      const data = res.data?.data || (Array.isArray(res.data) ? res.data : []);
       setPlanningRows(data);
       setTotalPlanning(data.length);
       return data;
@@ -84,22 +88,23 @@ const Admin = () => {
     }
   };
 
-  // Ambil data user
-  const fetchUsers = async () => {
+  const fetchOrganizing = async () => {
     try {
-      const res = await axios.get(USER_ENDPOINT);
-      const data = res.data?.data || [];
-      setUsers(data);
-      setTotalUsers(data.length);
+      const res = await axios.get(ORGANIZING_ENDPOINT, getAuthHeader());
+      const data = res.data?.data || (Array.isArray(res.data) ? res.data : []);
+      setOrganizingRows(data);
+      setTotalOrganizing(data.length);
+      return data;
     } catch (err) {
-      console.error("Gagal memuat data user:", err);
+      console.error("Gagal memuat data organizing:", err);
+      return [];
     }
   };
 
   const fetchVideo = async () => {
     try {
-      const res = await axios.get(VIDEO_ENDPOINT, { withCredentials: true });
-      const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const res = await axios.get(VIDEO_ENDPOINT, getAuthHeader());
+      const data = res.data?.data || (Array.isArray(res.data) ? res.data : []);
       setVideoRows(data);
       setTotalVideo(data.length);
       return data;
@@ -111,8 +116,8 @@ const Admin = () => {
 
   const fetchFoto = async () => {
     try {
-      const res = await axios.get(FOTO_ENDPOINT, { withCredentials: true });
-      const data = Array.isArray(res.data) ? res.data : res.data?.data || [];
+      const res = await axios.get(FOTO_ENDPOINT, getAuthHeader());
+      const data = res.data?.data || (Array.isArray(res.data) ? res.data : []);
       setFotoRows(data);
       setTotalFoto(data.length);
       return data;
@@ -122,9 +127,18 @@ const Admin = () => {
     }
   };
 
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(USER_ENDPOINT, getAuthHeader());
+      const data = res.data?.data || (Array.isArray(res.data) ? res.data : []);
+      setUsers(data);
+      setTotalUsers(data.length);
+    } catch (err) {
+      console.error("Gagal memuat data user:", err);
+    }
+  };
 
-  // Gabungkan dan buat chart untuk files + planning berdasarkan tanggal
-  // 🔶 Fungsi buildCombinedChart lengkap (versi final)
+  // Gabungkan dan buat chart
   const buildCombinedChart = (
     filesData = [],
     planningData = [],
@@ -132,15 +146,21 @@ const Admin = () => {
     videoData = [],
     fotoData = []
   ) => {
-    // Fungsi bantu: ubah tanggal jadi format yyyy-mm-dd
+    
+    // --- PERBAIKAN UTAMA DI SINI ---
+    // Menggunakan waktu lokal user (Browser Timezone)
     const getDateKey = (d) => {
       if (!d) return null;
       const dt = new Date(d);
       if (isNaN(dt)) return null;
-      return dt.toISOString().slice(0, 10);
+      
+      const year = dt.getFullYear();
+      const month = String(dt.getMonth() + 1).padStart(2, '0');
+      const day = String(dt.getDate()).padStart(2, '0');
+      
+      return `${year}-${month}-${day}`;
     };
 
-    // Format label tanggal agar tampil rapi di sumbu X
     const formatLabel = (isoKey) => {
       const dt = new Date(isoKey);
       return dt.toLocaleDateString("id-ID", {
@@ -150,47 +170,23 @@ const Admin = () => {
       });
     };
 
-    // Hitung jumlah File per tanggal
-    const filesCount = {};
-    filesData.forEach((f) => {
-      const key = getDateKey(f.uploaded_at);
-      if (!key) return;
-      filesCount[key] = (filesCount[key] || 0) + 1;
-    });
+    // Hitung jumlah per tanggal
+    const countByDate = (data, dateKeyName) => {
+      const counts = {};
+      data.forEach((item) => {
+        const dateVal = item[dateKeyName] || item.uploaded_at || item.tanggal;
+        const key = getDateKey(dateVal);
+        if (key) counts[key] = (counts[key] || 0) + 1;
+      });
+      return counts;
+    };
 
-    // Hitung jumlah Planning per tanggal
-    const planningCount = {};
-    planningData.forEach((p) => {
-      const key = getDateKey(p.uploaded_at);
-      if (!key) return;
-      planningCount[key] = (planningCount[key] || 0) + 1;
-    });
+    const filesCount = countByDate(filesData, 'uploaded_at');
+    const planningCount = countByDate(planningData, 'uploaded_at');
+    const organizingCount = countByDate(organizingData, 'uploaded_at');
+    const videoCount = countByDate(videoData, 'tanggal');
+    const fotoCount = countByDate(fotoData, 'uploaded_at');
 
-    // Hitung jumlah Organizing per tanggal
-    const organizingCount = {};
-    organizingData.forEach((o) => {
-      const key = getDateKey(o.uploaded_at);
-      if (!key) return;
-      organizingCount[key] = (organizingCount[key] || 0) + 1;
-    });
-
-    // Hitung jumlah Video per tanggal
-    const videoCount = {};
-    videoData.forEach((v) => {
-      const key = getDateKey(v.tanggal);
-      if (!key) return;
-      videoCount[key] = (videoCount[key] || 0) + 1;
-    });
-
-    // 🟧 Hitung jumlah Foto per tanggal
-    const fotoCount = {};
-    fotoData.forEach((f) => {
-      const key = getDateKey(f.tanggal);
-      if (!key) return;
-      fotoCount[key] = (fotoCount[key] || 0) + 1;
-    });
-
-    // Gabungkan semua tanggal dari berbagai sumber
     const allKeys = Array.from(
       new Set([
         ...Object.keys(filesCount),
@@ -201,7 +197,6 @@ const Admin = () => {
       ])
     ).sort();
 
-    // Buat label & nilai tiap dataset
     const labels = allKeys.map(formatLabel);
     const fileValues = allKeys.map((k) => filesCount[k] || 0);
     const planningValues = allKeys.map((k) => planningCount[k] || 0);
@@ -209,59 +204,57 @@ const Admin = () => {
     const videoValues = allKeys.map((k) => videoCount[k] || 0);
     const fotoValues = allKeys.map((k) => fotoCount[k] || 0);
 
-    // Jika tidak ada data, kosongkan chart
     if (labels.length === 0) {
       setChartData(null);
       return;
     }
 
-    // Set data untuk Chart.js
     setChartData({
       labels,
       datasets: [
         {
           label: "Upload File",
           data: fileValues,
-          backgroundColor: "rgba(59,130,246,0.75)", // biru
+          backgroundColor: "rgba(59,130,246,0.75)", 
           borderRadius: 6,
         },
         {
           label: "Upload Planning",
           data: planningValues,
-          backgroundColor: "rgba(16,185,129,0.75)", // hijau
+          backgroundColor: "rgba(16,185,129,0.75)", 
           borderRadius: 6,
         },
         {
           label: "Upload Organizing",
           data: organizingValues,
-          backgroundColor: "rgba(234,179,8,0.75)", // kuning
+          backgroundColor: "rgba(234,179,8,0.75)", 
           borderRadius: 6,
         },
         {
           label: "Upload Video",
           data: videoValues,
-          backgroundColor: "rgba(239,68,68,0.75)", // merah
+          backgroundColor: "rgba(239,68,68,0.75)", 
           borderRadius: 6,
         },
         {
           label: "Upload Foto",
           data: fotoValues,
-          backgroundColor: "rgba(249,115,22,0.85)", // 🟧 jingga/oranye
+          backgroundColor: "rgba(249,115,22,0.85)", 
           borderRadius: 6,
         },
       ],
     });
   };
 
-  // Hapus user
   const deleteUser = async (id, username) => {
     if (window.confirm(`Hapus user ${username}?`)) {
       try {
-        await axios.delete(`${API_BASE}/api/users/delete-user/${id}`);
+        await axios.delete(`${API_BASE}/api/users/${id}`, getAuthHeader());
         alert(`🗑️ User ${username} dihapus`);
         fetchUsers();
       } catch (err) {
         console.error("Gagal menghapus user:", err);
+        alert("Gagal menghapus user. Pastikan Anda memiliki hak akses.");
       }
     }
   };
@@ -276,15 +269,18 @@ const Admin = () => {
             fetchPlanning(),
             fetchOrganizing(),
             fetchVideo(),
-            fetchFoto(), // 🟧 baru ditambahkan
+            fetchFoto(),
           ]);
 
         buildCombinedChart(filesData, planningData, organizingData, videoData, fotoData);
         await fetchUsers();
+      } catch (err) {
+        console.error("Error loading dashboard data", err);
       } finally {
         setLoading(false);
       }
     };
+    
     loadAll();
 
     const storedUser = localStorage.getItem("user");
@@ -301,17 +297,14 @@ const Admin = () => {
       <SidebarAdmin />
 
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <header className="flex justify-between items-center p-4 bg-white border-b">
           <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
-
         </header>
 
-
-        {/* Main content */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 space-y-8">
           {/* Statistik */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
             {isSuperAdmin && (
               <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
                 <div>
@@ -322,7 +315,6 @@ const Admin = () => {
               </div>
             )}
 
-
             <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total File</p>
@@ -331,7 +323,6 @@ const Admin = () => {
               <FaFileAlt className="text-blue-500 w-12 h-12" />
             </div>
 
-            {/* Total Planning di sebelah Total File */}
             <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Planning</p>
@@ -348,7 +339,6 @@ const Admin = () => {
               <FaCalendarAlt className="text-yellow-500 w-12 h-12" />
             </div>
 
-            {/* placeholder card (kosong) agar layout tetap rapi, bisa diisi fitur lain */}
             <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Total Video</p>
@@ -364,7 +354,6 @@ const Admin = () => {
               </div>
               <FaImage className="text-orange-500 w-12 h-12" />
             </div>
-
           </div>
 
           {/* Grafik Upload File & Planning */}
@@ -394,10 +383,10 @@ const Admin = () => {
             )}
           </div>
 
-          {/* Data User */}
+          {/* Data User (Khusus Superadmin) */}
           {isSuperAdmin && (
             <div className="bg-white p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-4">Daftar User</h2>
+              <h2 className="text-xl font-semibold mb-4">Daftar User Aktif</h2>
               <div className="overflow-x-auto">
                 <table className="min-w-full">
                   <thead className="bg-gray-200">
@@ -409,21 +398,25 @@ const Admin = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {users.map((user, index) => (
-                      <tr key={user.id}>
-                        <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{user.username}</td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{user.level}</td>
-                        <td className="px-6 py-4 text-sm">
-                          <button
-                            onClick={() => deleteUser(user.id, user.username)}
-                            className="text-red-600 hover:text-red-800 flex items-center gap-2"
-                          >
-                            <FaTrash /> Hapus
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
+                    {users.length === 0 ? (
+                        <tr><td colSpan="4" className="text-center py-4 text-gray-500">Belum ada user.</td></tr>
+                    ) : (
+                        users.map((user, index) => (
+                        <tr key={user.id_user || user.id}>
+                            <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
+                            <td className="px-6 py-4 text-sm text-gray-900">{user.username}</td>
+                            <td className="px-6 py-4 text-sm text-gray-900 capitalize">{user.level}</td>
+                            <td className="px-6 py-4 text-sm">
+                            <button
+                                onClick={() => deleteUser(user.id_user || user.id, user.username)}
+                                className="text-red-600 hover:text-red-800 flex items-center gap-2"
+                            >
+                                Hapus
+                            </button>
+                            </td>
+                        </tr>
+                        ))
+                    )}
                   </tbody>
                 </table>
               </div>

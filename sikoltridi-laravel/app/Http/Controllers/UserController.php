@@ -67,6 +67,26 @@ class UserController extends Controller
         ]);
     }
 
+    public function getUsersDb()
+    {
+        try {
+            // Ambil semua user, urutkan dari yang terbaru (opsional)
+            // Pastikan model User sudah di-import: use App\Models\User;
+            $users = User::orderBy('id_user', 'desc')->get();
+
+            return response()->json([
+                'message' => 'Data user berhasil diambil',
+                'data' => $users
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Gagal mengambil data user',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
     // Pengajuan Akun
     public function ajukanAkun(Request $request)
     {
@@ -76,12 +96,15 @@ class UserController extends Controller
         ]);
 
         try {
-            PengajuanAkun::create([
-                'username' => $request->username,
-                'password' => $request->password, // Simpan apa adanya (atau Hash::make() jika mau aman)
-                'level' => 'user',
-                'status' => 'pending'
-            ]);
+           PengajuanAkun::create([
+            'username' => $request->username,
+            'password' => $request->password,
+            'level' => 'user',
+            'status' => 'pending',
+            'nama_lengkap' => $request->nama_lengkap,
+            'jabatan' => $request->jabatan,
+            'nip_nik' => $request->nip_nik,
+        ]);
 
             return response()->json(['msg' => "Pengajuan akun berhasil disimpan!"], 201);
         } catch (\Exception $err) {

@@ -32,8 +32,10 @@ class KomentarFotoController extends Controller
                 ];
             });
 
-            return response()->json($formattedData, 200);
-
+            return response()->json([
+                'data' => $formattedData
+            ], 200);
+            
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal mengambil komentar',
@@ -64,7 +66,6 @@ class KomentarFotoController extends Controller
                 'message' => 'Komentar berhasil ditambahkan',
                 'data' => $komentar
             ], 201);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal menambahkan komentar',
@@ -86,7 +87,6 @@ class KomentarFotoController extends Controller
             $komentar->delete();
 
             return response()->json(['message' => 'Komentar berhasil dihapus'], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Gagal menghapus komentar',

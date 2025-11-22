@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\DB;
 
 class VideoController extends Controller
 {
@@ -95,31 +96,38 @@ class VideoController extends Controller
      * Sudah benar (destroy)
      */
     public function destroy($id)
-    {
-        try {
-            $video = Video::find($id);
-            if (!$video) return response()->json(['message' => 'Video tidak ditemukan'], 404);
+{
+    try {
+        $video = Video::find($id);
+        if (!$video) return response()->json(['message' => 'Video tidak ditemukan'], 404);
 
-            if ($video->media) {
-                $videoPath = public_path('uploads/video/' . $video->media);
-                if (File::exists($videoPath)) {
-                    File::delete($videoPath);
-                }
+        // --- PERBAIKAN: Hapus Komentar Terkait Terlebih Dahulu ---
+        DB::table('komentar_video')->where('id_video', $id)->delete();
+        // ---------------------------------------------------------
+
+        // Hapus File Video Fisik
+        if ($video->media) {
+            $videoPath = public_path('uploads/video/' . $video->media);
+            if (File::exists($videoPath)) {
+                File::delete($videoPath);
             }
-
-            if ($video->thumbnail) {
-                $thumbPath = public_path('uploads/video/thumb/' . $video->thumbnail);
-                if (File::exists($thumbPath)) {
-                    File::delete($thumbPath);
-                }
-            }
-
-            $video->delete();
-            
-            return response()->json(['message' => 'Video berhasil dihapus']);
-
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal menghapus video', 'error' => $e->getMessage()], 500);
         }
+
+        // Hapus File Thumbnail Fisik
+        if ($video->thumbnail) {
+            $thumbPath = public_path('uploads/video/thumb/' . $video->thumbnail);
+            if (File::exists($thumbPath)) {
+                File::delete($thumbPath);
+            }
+        }
+
+        // Baru Hapus Record Video
+        $video->delete();
+        
+        return response()->json(['message' => 'Video berhasil dihapus']);
+
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Gagal menghapus video', 'error' => $e->getMessage()], 500);
     }
+}
 }
