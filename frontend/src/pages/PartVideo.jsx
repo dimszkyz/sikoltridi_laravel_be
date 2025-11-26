@@ -175,6 +175,7 @@ export default function PartVideo() {
             ) : (
               <div className="col-span-full text-center py-10">
                 <p className="text-gray-500 text-lg">Belum ada foto yang diunggah.</p>
+                <p className="text-gray-400 text-sm mt-1">Silakan cek kembali nanti.</p>
               </div>
             )}
           </div>
