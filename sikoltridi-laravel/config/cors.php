@@ -15,8 +15,8 @@ return [
     // HAPUS tanda '*' dan masukkan domain spesifik Anda di sini
     // Penulisan domain TIDAK BOLEH ada garis miring (/) di belakangnya
     'allowed_origins' => [
-        'http://sikoltridi.sidome.id',
-        'https://sikoltridi.sidome.id',
+        'http://127.0.0.1:8000',
+        'http://127.0.0.1:8000',
         'http://localhost:5173',      // Untuk development di laptop (Vite)
         'http://127.0.0.1:5173',      // Alternatif IP lokal
     ],

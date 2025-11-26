@@ -4,7 +4,7 @@ import SidebarAdmin from "../../components/sidebarAdmin";
 import { FaCheckCircle, FaTimesCircle, FaTrash } from "react-icons/fa";
 
 // 1. Gunakan Port Laravel (8000)
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 
 const DaftarPengajuanAkun = () => {
   const [pengajuan, setPengajuan] = useState([]);
