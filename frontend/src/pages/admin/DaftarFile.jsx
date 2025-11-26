@@ -53,7 +53,6 @@ const DaftarFile = () => {
     if (!window.confirm(`Yakin ingin menghapus file "${title}"?`)) return;
     
     try {
-      // --- PERBAIKAN: Ambil Token & Kirim di Header ---
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Anda tidak memiliki akses atau sesi habis. Silakan login.");
@@ -147,11 +146,10 @@ const DaftarFile = () => {
         </header>
 
         <main className="flex-1 overflow-x-auto overflow-y-auto bg-gray-100 p-6">
-          {/* Card Container: padding dihapus disini agar border header bisa full width */}
           <div className="bg-white rounded-lg shadow-md border border-gray-200">
             
-            {/* Header tabel dengan Border Bawah (Garis) */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+            {/* --- PERUBAHAN 1: Header tabel dengan Border Hitam (border-black) --- */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-black">
               <h2 className="text-xl font-semibold text-blue-700">Daftar File</h2>
               
               {/* Tombol Desktop */}
@@ -164,12 +162,10 @@ const DaftarFile = () => {
               </button>
             </div>
 
-            {/* Body Content dengan Padding */}
+            {/* Body Content */}
             <div className="p-6">
-              {/* Error message */}
               {error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-4">{error}</p>}
 
-              {/* Loading state */}
               {loading ? (
                 <div className="text-center text-gray-500 py-10">Memuat data...</div>
               ) : files.length === 0 ? (
@@ -214,10 +210,10 @@ const DaftarFile = () => {
         </footer>
       </div>
 
-      {/* Tombol Mobile (FAB) */}
+      {/* --- PERUBAHAN 2: Posisi Tombol Mobile Dinaikkan (bottom-24) --- */}
       <button
         onClick={() => setOpenModal(true)}
-        className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
+        className="md:hidden fixed bottom-24 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
         aria-label="Tambah Data"
         title="Tambah Data"
       >

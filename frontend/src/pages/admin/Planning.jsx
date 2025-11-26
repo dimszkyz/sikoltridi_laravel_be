@@ -48,7 +48,6 @@ const Planning = () => {
     if (!ok) return;
 
     try {
-      // --- Ambil Token & Kirim di Header ---
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Sesi habis atau Anda belum login. Silakan login ulang.");
@@ -180,7 +179,7 @@ const Planning = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header Title: disamakan ukurannya dengan DaftarFile (text-2xl) */}
+        {/* Header Title */}
         <header className="sticky top-0 z-10 flex items-center justify-between bg-white/80 backdrop-blur border-b px-4 py-3">
           <h1 className="text-2xl font-semibold text-gray-800">Planning</h1>
         </header>
@@ -191,8 +190,9 @@ const Planning = () => {
           )}
 
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-            {/* Toolbar card: tombol pindah ke sini, tampil di md+ (hidden di mobile) */}
-            <div className="flex items-center justify-between px-4 py-3 border-b">
+            
+            {/* --- HEADER CARD DENGAN GARIS HITAM --- */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-black">
               <h2 className="text-lg font-semibold text-blue-700">Daftar Planning</h2>
               <button
                 onClick={() => setOpenModal(true)}
@@ -252,10 +252,10 @@ const Planning = () => {
         </footer>
       </div>
 
-      {/* FAB (mobile only): Tombol tambah melayang khusus mobile */}
+      {/* --- TOMBOL MOBILE (FAB) DINAIKKAN KE ATAS (bottom-24) --- */}
       <button
         onClick={() => setOpenModal(true)}
-        className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
+        className="md:hidden fixed bottom-24 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
         aria-label="Tambah Data"
         title="Tambah Data"
       >

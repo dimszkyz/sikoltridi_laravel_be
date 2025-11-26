@@ -69,18 +69,23 @@ const SidebarAdmin = () => {
 
   return (
     <>
-      {/* Overlay gelap ketika sidebar mobile terbuka */}
+      {/* PERUBAHAN 1: Overlay
+        z-index dinaikkan menjadi z-[60] (lebih tinggi dari tombol + yg biasanya z-50).
+        Ini membuat area di bawah overlay (termasuk tombol +) tidak bisa diklik.
+      */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm md:hidden"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
-      {/* Tombol bulat di kanan atas (hanya mobile) */}
+      {/* PERUBAHAN 2: Tombol Toggle (Hamburger/Close)
+        z-index dinaikkan menjadi z-[80] agar selalu berada paling atas
+      */}
       <button
         type="button"
-        className="fixed top-4 right-4 z-50 flex h-9 w-9 items-center justify-center md:hidden"
+        className="fixed top-4 right-4 z-[80] flex h-9 w-9 items-center justify-center md:hidden"
         onClick={() => setIsMobileOpen((v) => !v)}
         aria-label="Toggle sidebar"
       >
@@ -91,10 +96,13 @@ const SidebarAdmin = () => {
         )}
       </button>
 
+      {/* PERUBAHAN 3: Aside (Panel Sidebar)
+        z-index dinaikkan menjadi z-[70] agar berada di atas overlay
+      */}
       <aside
         className={`${
           collapsed ? "w-20" : "w-72"
-        } group fixed md:static inset-y-0 left-0 z-40 flex h-screen flex-col
+        } group fixed md:static inset-y-0 left-0 z-[70] flex h-screen flex-col
         bg-gradient-to-b from-slate-900 to-slate-800 text-slate-200
         shadow-2xl ring-1 ring-slate-700/40 transform transition-transform duration-300
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
@@ -306,7 +314,7 @@ const SidebarAdmin = () => {
 
       {/* MODAL KONFIRMASI LOGOUT */}
       {isLogoutModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm">
           <div className="relative w-full max-w-md p-6 mx-4 bg-slate-800 rounded-2xl shadow-lg ring-1 ring-white/10">
             <button
               onClick={() => setLogoutModalOpen(false)}

@@ -95,8 +95,8 @@ const ControllingAdmin = () => {
         <main className="flex-1 overflow-x-auto overflow-y-auto bg-gray-50 p-4 md:p-6">
           <div className="bg-white rounded-lg shadow-md border border-gray-200">
             
-            {/* --- HEADER CARD DENGAN GARIS PEMISAH & TOMBOL RESPONSIF --- */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-6 py-4 border-b border-gray-200 gap-4 bg-white rounded-t-lg">
+            {/* --- HEADER CARD DENGAN GARIS HITAM (Updated) --- */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center px-6 py-4 border-b border-black gap-4 bg-white rounded-t-lg">
               <h2 className="text-xl font-semibold text-blue-700 w-full md:w-auto">
                 Laporan Kuesioner
               </h2>

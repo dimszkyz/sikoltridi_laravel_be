@@ -201,7 +201,9 @@ const Organizing = () => {
           )}
 
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
-            <div className="flex items-center justify-between px-4 py-3 border-b">
+            
+            {/* --- HEADER CARD DENGAN GARIS HITAM (Updated) --- */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-black">
               <h2 className="text-lg font-semibold text-blue-700">Daftar Organizing</h2>
               {/* Tombol Desktop: hidden di mobile */}
               <button
@@ -261,10 +263,10 @@ const Organizing = () => {
         </footer>
       </div>
 
-      {/* Tombol Mobile (FAB): hidden di desktop */}
+      {/* --- TOMBOL MOBILE (FAB) DINAIKKAN KE ATAS (bottom-24) --- */}
       <button
         onClick={() => setOpenModal(true)}
-        className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
+        className="md:hidden fixed bottom-24 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
         aria-label="Tambah Data"
         title="Tambah Data"
       >
