@@ -16,7 +16,7 @@ import {
   FaClipboardCheck,
   FaExclamationTriangle,
   FaTimes,
-  FaExternalLinkAlt, // <-- Tambahkan ikon ini
+  FaExternalLinkAlt,
 } from "react-icons/fa";
 
 const SidebarAdmin = () => {
@@ -27,6 +27,9 @@ const SidebarAdmin = () => {
   const flyoutRef = useRef(null);
 
   const [isLogoutModalOpen, setLogoutModalOpen] = useState(false);
+
+  // state untuk mobile sidebar
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -66,10 +69,35 @@ const SidebarAdmin = () => {
 
   return (
     <>
+      {/* Overlay gelap ketika sidebar mobile terbuka */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 backdrop-blur-sm md:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
+
+      {/* Tombol bulat di kanan atas (hanya mobile) */}
+      <button
+        type="button"
+        className="fixed top-4 right-4 z-50 flex h-9 w-9 items-center justify-center md:hidden"
+        onClick={() => setIsMobileOpen((v) => !v)}
+        aria-label="Toggle sidebar"
+      >
+        {isMobileOpen ? (
+          <FaTimes className="text-black text-xl" />
+        ) : (
+          <FaBars className="text-black text-xl" />
+        )}
+      </button>
+
       <aside
-        className={`${collapsed ? "w-20" : "w-72"} group fixed md:static inset-y-0 left-0 z-40 flex h-screen flex-col
+        className={`${
+          collapsed ? "w-20" : "w-72"
+        } group fixed md:static inset-y-0 left-0 z-40 flex h-screen flex-col
         bg-gradient-to-b from-slate-900 to-slate-800 text-slate-200
-        shadow-2xl ring-1 ring-slate-700/40 transition-all duration-300`}
+        shadow-2xl ring-1 ring-slate-700/40 transform transition-transform duration-300
+        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
       >
         {/* === Brand / Toggle === */}
         <div
@@ -88,9 +116,10 @@ const SidebarAdmin = () => {
               </div>
             </div>
           )}
+          {/* tombol collapse hanya muncul di md+ */}
           <button
             onClick={() => setCollapsed((v) => !v)}
-            className="text-slate-300/80 hover:text-white rounded-lg p-2 transition"
+            className="hidden md:inline-flex text-slate-300/80 hover:text-white rounded-lg p-2 transition"
             title={collapsed ? "Expand" : "Collapse"}
           >
             {collapsed ? <FaBars /> : <FaChevronLeft />}
@@ -99,20 +128,17 @@ const SidebarAdmin = () => {
 
         {/* === Navigation === */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          {/* --- TOMBOL LIHAT SITUS DITAMBAHKAN DI SINI --- */}
+          {/* Tombol Lihat Situs */}
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
             title="Lihat Situs"
             className="relative flex items-center gap-3 rounded-xl px-3 py-3 transition hover:bg-white/5 hover:shadow-inner text-slate-300"
+            onClick={() => setIsMobileOpen(false)}
           >
-            <span
-              className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-lg transition bg-transparent"
-            />
-            <div
-              className="grid place-items-center h-9 w-9 rounded-lg transition bg-white/5 text-slate-300"
-            >
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-8 w-1 rounded-r-lg transition bg-transparent" />
+            <div className="grid place-items-center h-9 w-9 rounded-lg transition bg-white/5 text-slate-300">
               <FaExternalLinkAlt size={18} />
             </div>
             {!collapsed && (
@@ -121,7 +147,6 @@ const SidebarAdmin = () => {
               </span>
             )}
           </a>
-          {/* ------------------------------------------- */}
 
           {navLinks.map((link) => {
             const Icon = link.icon;
@@ -130,6 +155,7 @@ const SidebarAdmin = () => {
                 key={link.to}
                 to={link.to}
                 title={link.text}
+                onClick={() => setIsMobileOpen(false)}
                 className={({ isActive }) =>
                   [
                     "relative flex items-center gap-3 rounded-xl px-3 py-3 transition",
@@ -168,7 +194,7 @@ const SidebarAdmin = () => {
           })}
 
           {/* === Actuating (submenu) === */}
-          <div className="relative">
+          <div className="relative" ref={flyoutRef}>
             <button
               type="button"
               onClick={() => setActuatingOpen((v) => !v)}
@@ -210,6 +236,7 @@ const SidebarAdmin = () => {
               <div className="mt-1 ml-12 space-y-1">
                 <NavLink
                   to="/admin/actuating/video"
+                  onClick={() => setIsMobileOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${
                       isActive
@@ -223,6 +250,7 @@ const SidebarAdmin = () => {
                 </NavLink>
                 <NavLink
                   to="/admin/actuating/foto"
+                  onClick={() => setIsMobileOpen(false)}
                   className={({ isActive }) =>
                     `flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition ${
                       isActive
@@ -254,8 +282,12 @@ const SidebarAdmin = () => {
                   className="h-9 w-9 rounded-full ring-1 ring-white/10"
                 />
                 <div className="leading-tight">
-                  <p className="text-sm font-semibold">{user?.username || "Admin"}</p>
-                  <p className="text-xs text-slate-400 capitalize">{user?.level || "level"}</p>
+                  <p className="text-sm font-semibold">
+                    {user?.username || "Admin"}
+                  </p>
+                  <p className="text-xs text-slate-400 capitalize">
+                    {user?.level || "level"}
+                  </p>
                 </div>
               </div>
             )}
@@ -264,7 +296,9 @@ const SidebarAdmin = () => {
               className="flex items-center gap-2 rounded-lg px-3 py-2 text-slate-200 hover:bg-red-500/10 hover:text-red-300 transition"
             >
               <FaSignOutAlt />
-              {!collapsed && <span className="text-sm font-medium">Logout</span>}
+              {!collapsed && (
+                <span className="text-sm font-medium">Logout</span>
+              )}
             </button>
           </div>
         </div>
@@ -285,7 +319,9 @@ const SidebarAdmin = () => {
               <div className="grid w-16 h-16 mb-4 text-yellow-400 bg-yellow-400/10 rounded-full place-items-center ring-8 ring-yellow-400/20">
                 <FaExclamationTriangle size={32} />
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">Konfirmasi Logout</h2>
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Konfirmasi Logout
+              </h2>
               <p className="text-slate-300 mb-8">
                 Apakah Anda yakin ingin keluar dari Admin Panel?
               </p>
