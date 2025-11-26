@@ -16,7 +16,7 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 
 // Endpoint
 const FILE_ENDPOINT = `${API_BASE}/api/files`;
@@ -29,25 +29,25 @@ const FOTO_ENDPOINT = `${API_BASE}/api/foto`;
 const Admin = () => {
   const [files, setFiles] = useState([]);
   const [totalFiles, setTotalFiles] = useState(0);
-  
+
   const [planningRows, setPlanningRows] = useState([]);
   const [totalPlanning, setTotalPlanning] = useState(0);
-  
+
   const [users, setUsers] = useState([]);
   const [totalUsers, setTotalUsers] = useState(0);
-  
+
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
-  
+
   const [organizingRows, setOrganizingRows] = useState([]);
   const [totalOrganizing, setTotalOrganizing] = useState(0);
-  
+
   const [videoRows, setVideoRows] = useState([]);
   const [totalVideo, setTotalVideo] = useState(0);
-  
+
   const [fotoRows, setFotoRows] = useState([]);
   const [totalFoto, setTotalFoto] = useState(0);
-  
+
   const [user, setUser] = useState(null);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
 
@@ -146,18 +146,18 @@ const Admin = () => {
     videoData = [],
     fotoData = []
   ) => {
-    
+
     // --- PERBAIKAN UTAMA DI SINI ---
     // Menggunakan waktu lokal user (Browser Timezone)
     const getDateKey = (d) => {
       if (!d) return null;
       const dt = new Date(d);
       if (isNaN(dt)) return null;
-      
+
       const year = dt.getFullYear();
       const month = String(dt.getMonth() + 1).padStart(2, '0');
       const day = String(dt.getDate()).padStart(2, '0');
-      
+
       return `${year}-${month}-${day}`;
     };
 
@@ -215,31 +215,31 @@ const Admin = () => {
         {
           label: "Upload File",
           data: fileValues,
-          backgroundColor: "rgba(59,130,246,0.75)", 
+          backgroundColor: "rgba(59,130,246,0.75)",
           borderRadius: 6,
         },
         {
           label: "Upload Planning",
           data: planningValues,
-          backgroundColor: "rgba(16,185,129,0.75)", 
+          backgroundColor: "rgba(16,185,129,0.75)",
           borderRadius: 6,
         },
         {
           label: "Upload Organizing",
           data: organizingValues,
-          backgroundColor: "rgba(234,179,8,0.75)", 
+          backgroundColor: "rgba(234,179,8,0.75)",
           borderRadius: 6,
         },
         {
           label: "Upload Video",
           data: videoValues,
-          backgroundColor: "rgba(239,68,68,0.75)", 
+          backgroundColor: "rgba(239,68,68,0.75)",
           borderRadius: 6,
         },
         {
           label: "Upload Foto",
           data: fotoValues,
-          backgroundColor: "rgba(249,115,22,0.85)", 
+          backgroundColor: "rgba(249,115,22,0.85)",
           borderRadius: 6,
         },
       ],
@@ -280,7 +280,7 @@ const Admin = () => {
         setLoading(false);
       }
     };
-    
+
     loadAll();
 
     const storedUser = localStorage.getItem("user");
@@ -304,7 +304,7 @@ const Admin = () => {
         <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6 space-y-8">
           {/* Statistik */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            
+
             {isSuperAdmin && (
               <div className="bg-white p-6 rounded-lg shadow-md flex items-center justify-between">
                 <div>
@@ -372,31 +372,31 @@ const Admin = () => {
                     responsive: true,
                     maintainAspectRatio: false, // PENTING: Agar grafik mengikuti tinggi container
                     plugins: {
-                      legend: { 
-                        display: true, 
+                      legend: {
+                        display: true,
                         position: "top",
                         labels: {
-                            boxWidth: 12, // Perkecil kotak warna legenda
-                            font: { size: 11 } // Perkecil font legenda di mobile
+                          boxWidth: 12, // Perkecil kotak warna legenda
+                          font: { size: 11 } // Perkecil font legenda di mobile
                         }
                       },
                       title: { display: false },
                     },
                     scales: {
-                      x: { 
+                      x: {
                         grid: { display: false },
                         ticks: {
-                            font: { size: 10 }, // Font sumbu X lebih kecil agar muat
-                            maxRotation: 45,    // Miringkan teks jika terlalu panjang
-                            minRotation: 0
+                          font: { size: 10 }, // Font sumbu X lebih kecil agar muat
+                          maxRotation: 45,    // Miringkan teks jika terlalu panjang
+                          minRotation: 0
                         }
                       },
-                      y: { 
-                        beginAtZero: true, 
-                        ticks: { 
-                            precision: 0,
-                            font: { size: 10 } 
-                        } 
+                      y: {
+                        beginAtZero: true,
+                        ticks: {
+                          precision: 0,
+                          font: { size: 10 }
+                        }
                       },
                     },
                   }}
@@ -421,23 +421,27 @@ const Admin = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {users.length === 0 ? (
-                        <tr><td colSpan="4" className="text-center py-4 text-gray-500">Belum ada user.</td></tr>
+                      <tr><td colSpan="4" className="text-center py-4 text-gray-500">Belum ada user.</td></tr>
                     ) : (
-                        users.map((user, index) => (
+                      users.map((user, index) => (
                         <tr key={user.id_user || user.id}>
-                            <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
-                            <td className="px-6 py-4 text-sm text-gray-900">{user.username}</td>
-                            <td className="px-6 py-4 text-sm text-gray-900 capitalize">{user.level}</td>
-                            <td className="px-6 py-4 text-sm">
-                            <button
+                          <td className="px-6 py-4 text-sm text-gray-900">{index + 1}</td>
+                          <td className="px-6 py-4 text-sm text-gray-900">{user.username}</td>
+                          <td className="px-6 py-4 text-sm text-gray-900 capitalize">{user.level}</td>
+                          <td className="px-6 py-4 text-sm">
+                            {user.level !== 'admin' && user.level !== 'superadmin' ? (
+                              <button
                                 onClick={() => deleteUser(user.id_user || user.id, user.username)}
                                 className="text-red-600 hover:text-red-800 flex items-center gap-2"
-                            >
+                              >
                                 Hapus
-                            </button>
-                            </td>
+                              </button>
+                            ) : (
+                              <span className="text-gray-400 text-xs italic">-</span>
+                            )}
+                          </td>
                         </tr>
-                        ))
+                      ))
                     )}
                   </tbody>
                 </table>

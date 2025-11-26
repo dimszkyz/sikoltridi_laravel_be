@@ -3,7 +3,7 @@ import axios from "axios";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.entry";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 
 // Ukuran kotak abu-abu (card) tempat thumbnail PDF
 const THUMB_W = 300;   // mengikuti w-[300px] pada card

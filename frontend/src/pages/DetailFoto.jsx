@@ -13,7 +13,7 @@ const DetailFoto = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+  const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {

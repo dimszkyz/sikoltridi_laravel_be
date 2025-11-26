@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import axios from "axios";
 // import Navbar from "../components/navbar"; // <-- DIHILANGKAN
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 const SCALE = ["Sangat Baik", "Baik", "Cukup", "Kurang", "Sangat Kurang"];
 
 // ---------- PERTANYAAN ----------

@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 // Pastikan Port 8000 (Laravel)
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 
 export default function PartVideo() {
   const [activeTab, setActiveTab] = useState("video");

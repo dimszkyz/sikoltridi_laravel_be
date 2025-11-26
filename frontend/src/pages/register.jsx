@@ -4,7 +4,7 @@ import axios from "axios";
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 // 1. Gunakan Port Laravel
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 
 const Register = () => {
   const navigate = useNavigate();

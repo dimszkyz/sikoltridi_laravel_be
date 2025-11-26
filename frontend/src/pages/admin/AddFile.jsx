@@ -4,7 +4,7 @@ import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.entry";
 
 // Pastikan URL ini sesuai dengan Backend Laravel (Port 8000)
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 const CREATE_ENDPOINT = `${API_BASE}/api/files`; // Menggunakan jamak 'files'
 
 export default function AddFileModal({ open, onClose, onSuccess }) {

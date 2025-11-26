@@ -20,12 +20,12 @@ export default defineConfig({
     // TAMBAHKAN INI:
     proxy: {
         '/api': {
-            target: 'https://sikoltridi.sidome.id',
+            target: 'https://sikoltridi.id',
             changeOrigin: true,
             secure: false,
         },
         '/uploads': {
-            target: 'https://sikoltridi.sidome.id',
+            target: 'https://sikoltridi.id',
             changeOrigin: true,
             secure: false,
         }

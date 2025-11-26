@@ -4,7 +4,7 @@ import SidebarAdmin from "../../components/sidebarAdmin";
 import { FaPlus, FaTrash, FaVideo } from "react-icons/fa"; // Hapus FaImage jika tidak dipakai
 import AddVideo from "./AddVideo";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 
 // --- PERBAIKAN UTAMA: Tambahkan 's' (videos) agar sesuai route Laravel ---
 const LIST_ENDPOINT = `${API_BASE}/api/videos`;

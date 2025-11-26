@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 // PERBAIKAN 1: Gunakan endpoint jamak 'videos' sesuai api.php
 const CREATE_ENDPOINT = `${API_BASE}/api/videos`;
 

@@ -15,7 +15,7 @@ const LoginForm = () => {
     setError('');
 
     try {
-      const response = await axios.post('https://sikoltridi.sidome.id/api/login', {
+      const response = await axios.post('https://sikoltridi.id/api/login', {
         username,
         password,
       });

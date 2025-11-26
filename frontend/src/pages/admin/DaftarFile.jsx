@@ -5,7 +5,7 @@ import { FaPlus, FaTrash, FaFilePdf } from "react-icons/fa";
 import PdfThumb from "../../components/PdfThumb";
 import AddFile from "./AddFile"; 
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 const LIST_ENDPOINT = `${API_BASE}/api/files`;
 const DELETE_ENDPOINT = (id) => `${API_BASE}/api/files/${id}`;
 const PDF_URL = (filename) => `${API_BASE}/uploads/files/${filename}`;

@@ -4,7 +4,7 @@ import SidebarAdmin from "../../components/sidebarAdmin";
 import { FaPlus, FaTrash, FaImage } from "react-icons/fa";
 import AddFoto from "./AddFoto";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
 const LIST_ENDPOINT = `${API_BASE}/api/foto`;
 const DELETE_ENDPOINT = (id) => `${API_BASE}/api/foto/${id}`;
 const IMAGE_URL = (filename) => `${API_BASE}/uploads/foto/${filename}`;
