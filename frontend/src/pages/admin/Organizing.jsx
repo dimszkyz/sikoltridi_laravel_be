@@ -3,7 +3,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import SidebarAdmin from "../../components/sidebarAdmin";
 import { FaPlus, FaTrash, FaFilePdf } from "react-icons/fa";
-import AddOrganizing from "./AddOrganizing"; // tetap gunakan modal upload yang sama
+import AddOrganizing from "./AddOrganizing"; 
 import PdfThumb from "../../components/PdfThumb";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.id";
@@ -54,7 +54,6 @@ const Organizing = () => {
     if (!ok) return;
 
     try {
-      // --- PERBAIKAN: Ambil Token & Kirim di Header ---
       const token = localStorage.getItem("token");
       if (!token) {
         alert("Sesi habis atau Anda belum login. Silakan login ulang.");
@@ -189,9 +188,9 @@ const Organizing = () => {
       <SidebarAdmin />
 
       <div className="flex-1 flex flex-col">
+        {/* Header dengan ukuran text-2xl sesuai permintaan */}
         <header className="sticky top-0 z-10 flex items-center justify-between bg-white/80 backdrop-blur border-b px-4 py-3">
-          <h1 className="text-xl md:text-2xl font-semibold text-gray-800">Organizing</h1>
-          
+          <h1 className="text-2xl font-semibold text-gray-800">Organizing</h1>
         </header>
 
         <main className="flex-1 p-4 md:p-6 space-y-4">
@@ -204,6 +203,7 @@ const Organizing = () => {
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
             <div className="flex items-center justify-between px-4 py-3 border-b">
               <h2 className="text-lg font-semibold text-blue-700">Daftar Organizing</h2>
+              {/* Tombol Desktop: hidden di mobile */}
               <button
                 onClick={() => setOpenModal(true)}
                 className="hidden md:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 active:scale-[0.99] transition"
@@ -261,6 +261,7 @@ const Organizing = () => {
         </footer>
       </div>
 
+      {/* Tombol Mobile (FAB): hidden di desktop */}
       <button
         onClick={() => setOpenModal(true)}
         className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"

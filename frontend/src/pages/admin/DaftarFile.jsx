@@ -1,3 +1,4 @@
+// frontend/src/pages/admin/DaftarFile.jsx
 import React, { useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import SidebarAdmin from "../../components/sidebarAdmin";
@@ -143,69 +144,85 @@ const DaftarFile = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="flex justify-between items-center p-4 bg-white border-b">
           <h1 className="text-2xl font-semibold text-gray-800">Manajemen File</h1>
-          
         </header>
 
         <main className="flex-1 overflow-x-auto overflow-y-auto bg-gray-100 p-6">
-          <div className="bg-white p-6 rounded-lg shadow-md">
-            {/* Header tabel */}
-            <div className="flex justify-between items-center mb-4 text-blue-700">
-              <h2 className="text-xl font-semibold">Daftar File</h2>
+          {/* Card Container: padding dihapus disini agar border header bisa full width */}
+          <div className="bg-white rounded-lg shadow-md border border-gray-200">
+            
+            {/* Header tabel dengan Border Bawah (Garis) */}
+            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-blue-700">Daftar File</h2>
+              
+              {/* Tombol Desktop */}
               <button
                 onClick={() => setOpenModal(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 flex items-center"
+                className="hidden md:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 active:scale-[0.99] transition"
               >
                 <FaPlus className="mr-2" />
                 Tambah Data
               </button>
             </div>
 
-            {/* Error message */}
-            {error && <p className="text-red-500 bg-red-100 p-3 rounded-md">{error}</p>}
+            {/* Body Content dengan Padding */}
+            <div className="p-6">
+              {/* Error message */}
+              {error && <p className="text-red-500 bg-red-100 p-3 rounded-md mb-4">{error}</p>}
 
-            {/* Loading state */}
-            {loading ? (
-              <div className="text-center text-gray-500 py-10">Memuat data...</div>
-            ) : files.length === 0 ? (
-              <div className="text-center text-gray-500 py-10">Belum ada file diunggah.</div>
-            ) : (
-              <div className="overflow-x-auto rounded-lg border border-gray-200">
-                <table className="min-w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        No
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Judul File
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Thumbnail
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        File PDF
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Waktu Upload
-                      </th>
-                      <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        Aksi
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">{tableRows}</tbody>
-                </table>
-              </div>
-            )}
+              {/* Loading state */}
+              {loading ? (
+                <div className="text-center text-gray-500 py-10">Memuat data...</div>
+              ) : files.length === 0 ? (
+                <div className="text-center text-gray-500 py-10">Belum ada file diunggah.</div>
+              ) : (
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          No
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Judul File
+                        </th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Thumbnail
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          File PDF
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Waktu Upload
+                        </th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">{tableRows}</tbody>
+                  </table>
+                </div>
+              )}
+            </div>
           </div>
         </main>
         
-          <footer className="bg-white border-t border-gray-200 py-4 text-center text-gray-500 text-sm shrink-0">
+        <footer className="bg-white border-t border-gray-200 py-4 text-center text-gray-500 text-sm shrink-0">
             <p className="tracking-wide">
               © Copyright <span className="font-bold">GAZEBO CODING 2025</span> All Rights Reserved
             </p>
         </footer>
       </div>
+
+      {/* Tombol Mobile (FAB) */}
+      <button
+        onClick={() => setOpenModal(true)}
+        className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
+        aria-label="Tambah Data"
+        title="Tambah Data"
+      >
+        <FaPlus />
+      </button>
 
       {/* Modal Tambah File */}
       <AddFile open={openModal} onClose={() => setOpenModal(false)} onSuccess={fetchFiles} />
