@@ -2,7 +2,7 @@
 import React from "react";
 import { motion, MotionConfig } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom"; // <-- DITAMBAHKAN
-import { FaEnvelope } from "react-icons/fa"; // <-- DITAMBAHKAN
+import { FaEnvelope, FaInstagram, FaTiktok } from "react-icons/fa"; // <-- DITAMBAHKAN
 import Navbar from "../components/navbar";
 import Partfile from "./PartFile";
 import logo from "../assets/img/output-onlinepngtools.png";
@@ -120,12 +120,12 @@ const Home = () => {
                          text-[32px] sm:text-[36px] md:text-[42px] lg:text-[56px]"
                 style={{ whiteSpace: "pre-line" }}
               >
-                {`"Sistem informasi\nkolaborasi tripusat\npendidikan"`}
+                {`"Sistem Informasi\nKolaborasi Tripusat\nPendidikan"`}
               </motion.p>
 
               <motion.a
                 variants={textItem}
-                href="#file"
+                href="#partfile"
                 className="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-full shadow-md hover:bg-blue-700 transition"
                 whileHover={{ y: -2 }}
                 whileTap={{ scale: 0.98 }}
@@ -174,7 +174,7 @@ const Home = () => {
       <footer className="bg-white text-slate-700 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-16 pt-12 pb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
-            
+
             {/* Kolom 1: Logo & Brand */}
             <div className="flex flex-col items-center md:items-start">
               <img src={logo} alt="Logo Sikoltridi" className="w-60 h-60 object-contain mb-2" />
@@ -198,24 +198,52 @@ const Home = () => {
               </ul>
             </div>
 
-            {/* Kolom 3: Info Lebih Lanjut (sesuai permintaan) */}
+            {/* Kolom 3: Informasi Lebih Lanjut (Updated) */}
             <div>
-              <h4 className="font-bold text-lg mb-3 text-slate-900">Informasi Lebih Lanjut</h4>
-              <ul className="space-y-2 text-slate-600">
+              <h4 className="font-bold text-lg mb-3 text-slate-900">Sosial Media</h4>
+              <ul className="space-y-3 text-slate-600">
+                {/* Email */}
                 <li className="flex items-center justify-center md:justify-start">
-                  <FaEnvelope className="mr-2" />
-                  <a href="mailto:Gtech@gmail.com" className="hover:text-blue-600">
-                    Gtech@gmail.com
+                  <FaEnvelope className="mr-2 text-lg" />
+                  <a href="mailto:gazebocoding@gmail.com" className="hover:text-blue-600 transition">
+                    gazebocoding@gmail.com
+                  </a>
+                </li>
+
+                {/* Instagram */}
+                <li className="flex items-center justify-center md:justify-start">
+                  <FaInstagram className="mr-2 text-lg" />
+                  <a
+                    href="https://www.instagram.com/gazebocoding"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-pink-600 transition"
+                  >
+                    @gazebocoding
+                  </a>
+                </li>
+
+                {/* TikTok */}
+                <li className="flex items-center justify-center md:justify-start">
+                  <FaTiktok className="mr-2 text-lg" />
+                  <a
+                    href="https://www.tiktok.com/@gazebocoding"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-black transition"
+                  >
+                    @gazebocoding
                   </a>
                 </li>
               </ul>
             </div>
-            
+
           </div>
+
           {/* Copyright */}
           <div className="border-t border-gray-200 mt-10 pt-6 text-center text-gray-500 text-sm">
             <p className="tracking-wide">
-              © Copyright <span className="font-bold">GAZEBO TECH 2025</span> All Rights Reserved
+              © Copyright <span className="font-bold">GAZEBO CODING 2025</span> All Rights Reserved
             </p>
           </div>
         </div>

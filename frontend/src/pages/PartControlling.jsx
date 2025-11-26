@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import axios from "axios";
 // import Navbar from "../components/navbar"; // <-- DIHILANGKAN
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
 const SCALE = ["Sangat Baik", "Baik", "Cukup", "Kurang", "Sangat Kurang"];
 
 // ---------- PERTANYAAN ----------
@@ -457,7 +457,7 @@ export default function PartControlling() {
       {/* Footer copyright */}
       <footer className="bg-white text-black text-center py-4 mt-10 border-t border-gray-200">
         <p className="text-sm tracking-wide">
-          © Copyright <span className="font-bold">GAZEBOTECH 2025</span> All Rights Reserved
+          © Copyright <span className="font-bold">GAZEBO CODING 2025</span> All Rights Reserved
         </p>
       </footer>
     </>

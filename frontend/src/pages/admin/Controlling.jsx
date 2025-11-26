@@ -3,7 +3,7 @@ import axios from "axios";
 import SidebarAdmin from "../../components/sidebarAdmin";
 import * as XLSX from "xlsx";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
 const LIST_ENDPOINT = `${API_BASE}/api/kuesioner`;
 
 const ControllingAdmin = () => {
@@ -17,10 +17,10 @@ const ControllingAdmin = () => {
     try {
       // --- PERBAIKAN UTAMA: Ambil Token ---
       const token = localStorage.getItem("token");
-      
+
       // Jika token tidak ada (misal belum login), request pasti 401
       // Bisa ditambahkan redirect ke login jika mau, tapi di sini kita biarkan axios menangani errornya
-      
+
       const response = await axios.get(LIST_ENDPOINT, {
         headers: {
           Authorization: `Bearer ${token}`, // Kirim Token di Header
@@ -127,16 +127,16 @@ const ControllingAdmin = () => {
               </h2>
               <div className="flex gap-2">
                 <button
-                    onClick={fetchData}
-                    className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow text-sm"
+                  onClick={fetchData}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg shadow text-sm"
                 >
-                    Refresh Data
+                  Refresh Data
                 </button>
                 <button
-                    onClick={exportToExcel}
-                    className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg shadow text-sm"
+                  onClick={exportToExcel}
+                  className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg shadow text-sm"
                 >
-                    Export ke Excel
+                  Export ke Excel
                 </button>
               </div>
             </div>
@@ -144,11 +144,11 @@ const ControllingAdmin = () => {
             {/* Status loading/error */}
             {loading && (
               <div className="text-center py-8">
-                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
-                  <p className="text-gray-500 text-sm mt-2">Memuat data...</p>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+                <p className="text-gray-500 text-sm mt-2">Memuat data...</p>
               </div>
             )}
-            
+
             {error && (
               <p className="text-red-600 bg-red-50 border border-red-200 rounded p-3 mb-4 text-center">
                 {error}
@@ -158,33 +158,38 @@ const ControllingAdmin = () => {
             {/* === Tabel Data === */}
             {!loading && !error && (
               data.length === 0 ? (
-                  <p className="text-center text-gray-500 py-8 italic">Belum ada data kuesioner yang masuk.</p>
+                <p className="text-center text-gray-500 py-8 italic">Belum ada data kuesioner yang masuk.</p>
               ) : (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full border border-gray-200 text-sm text-gray-800">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="border px-3 py-2 text-center">No</th>
-                          <th className="border px-3 py-2">Nama</th>
-                          <th className="border px-3 py-2">Jabatan</th>
-                          <th className="border px-3 py-2">Lembaga</th>
-                          {columns.slice(3).map((col) => (
-                            <th
-                              key={col}
-                              className="border px-3 py-2 text-center whitespace-nowrap uppercase text-xs"
-                            >
-                              {col}
-                            </th>
-                          ))}
-                        </tr>
-                      </thead>
-                      <tbody>{tableRows}</tbody>
-                    </table>
-                  </div>
+                <div className="overflow-x-auto">
+                  <table className="min-w-full border border-gray-200 text-sm text-gray-800">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="border px-3 py-2 text-center">No</th>
+                        <th className="border px-3 py-2">Nama</th>
+                        <th className="border px-3 py-2">Jabatan</th>
+                        <th className="border px-3 py-2">Lembaga</th>
+                        {columns.slice(3).map((col) => (
+                          <th
+                            key={col}
+                            className="border px-3 py-2 text-center whitespace-nowrap uppercase text-xs"
+                          >
+                            {col}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>{tableRows}</tbody>
+                  </table>
+                </div>
               )
             )}
           </div>
         </main>
+          <footer className="bg-white border-t border-gray-200 py-4 text-center text-gray-500 text-sm shrink-0">
+            <p className="tracking-wide">
+              © Copyright <span className="font-bold">GAZEBO CODING 2025</span> All Rights Reserved
+            </p>
+        </footer>
       </div>
     </div>
   );

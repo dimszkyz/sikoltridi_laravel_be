@@ -5,7 +5,7 @@ import { FaPlus, FaTrash, FaFilePdf } from "react-icons/fa";
 import PdfThumb from "../../components/PdfThumb";
 import AddFile from "./AddFile"; 
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
 const LIST_ENDPOINT = `${API_BASE}/api/files`;
 const DELETE_ENDPOINT = (id) => `${API_BASE}/api/files/${id}`;
 const PDF_URL = (filename) => `${API_BASE}/uploads/files/${filename}`;
@@ -199,6 +199,12 @@ const DaftarFile = () => {
             )}
           </div>
         </main>
+        
+          <footer className="bg-white border-t border-gray-200 py-4 text-center text-gray-500 text-sm shrink-0">
+            <p className="tracking-wide">
+              © Copyright <span className="font-bold">GAZEBO CODING 2025</span> All Rights Reserved
+            </p>
+        </footer>
       </div>
 
       {/* Modal Tambah File */}

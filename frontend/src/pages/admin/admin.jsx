@@ -16,7 +16,7 @@ import {
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
 
 // Endpoint
 const FILE_ENDPOINT = `${API_BASE}/api/files`;
@@ -357,25 +357,47 @@ const Admin = () => {
           </div>
 
           {/* Grafik Upload File & Planning */}
-          <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="bg-white p-4 md:p-6 rounded-lg shadow-md">
             <h2 className="text-lg font-semibold mb-4">Grafik Upload per Tanggal</h2>
             {loading ? (
               <p className="text-gray-500">Memuat data grafik...</p>
             ) : !chartData || chartData.labels.length === 0 ? (
               <p className="text-gray-500">Belum ada data upload.</p>
             ) : (
-              <div style={{ width: "100%", height: 350 }}>
+              // PERBAIKAN: Gunakan class Tailwind untuk tinggi responsif & hapus style inline statis
+              <div className="relative w-full h-[300px] md:h-[400px]">
                 <Bar
                   data={chartData}
                   options={{
                     responsive: true,
+                    maintainAspectRatio: false, // PENTING: Agar grafik mengikuti tinggi container
                     plugins: {
-                      legend: { display: true, position: "top" },
+                      legend: { 
+                        display: true, 
+                        position: "top",
+                        labels: {
+                            boxWidth: 12, // Perkecil kotak warna legenda
+                            font: { size: 11 } // Perkecil font legenda di mobile
+                        }
+                      },
                       title: { display: false },
                     },
                     scales: {
-                      x: { grid: { display: false } },
-                      y: { beginAtZero: true, ticks: { precision: 0 } },
+                      x: { 
+                        grid: { display: false },
+                        ticks: {
+                            font: { size: 10 }, // Font sumbu X lebih kecil agar muat
+                            maxRotation: 45,    // Miringkan teks jika terlalu panjang
+                            minRotation: 0
+                        }
+                      },
+                      y: { 
+                        beginAtZero: true, 
+                        ticks: { 
+                            precision: 0,
+                            font: { size: 10 } 
+                        } 
+                      },
                     },
                   }}
                 />
@@ -422,6 +444,12 @@ const Admin = () => {
               </div>
             </div>
           )}
+
+          <div className="border-t border-gray-200 mt-10 pt-6 text-center text-gray-500 text-sm">
+            <p className="tracking-wide">
+              © Copyright <span className="font-bold">GAZEBO CODING 2025</span> All Rights Reserved
+            </p>
+          </div>
         </main>
       </div>
     </div>

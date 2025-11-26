@@ -15,7 +15,7 @@ import PartControlling from "./pages/PartControlling";
 import ControllingAdmin from "./pages/admin/Controlling";
 import DetailVideo from "./pages/DetailVideo";
 import Video from "./pages/admin/video.jsx";
-import Foto from "./pages/admin/foto.jsx";
+import Foto from "./pages/admin/Foto.jsx";
 import DetailFoto from "./pages/DetailFoto";
 
 import RequireAuth from "./components/RequireAuth"; // <-- import

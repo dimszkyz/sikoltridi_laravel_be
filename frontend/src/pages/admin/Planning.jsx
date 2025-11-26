@@ -6,7 +6,7 @@ import { FaPlus, FaTrash, FaFilePdf } from "react-icons/fa";
 import AddPlanning from "./AddPlanning";
 import PdfThumb from "../../components/PdfThumb";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "https://sikoltridi.sidome.id";
 const LIST_ENDPOINT = `${API_BASE}/api/planning`;
 const DELETE_ENDPOINT = (id) => `${API_BASE}/api/planning/${id}`;
 const PDF_URL = (filename) => `${API_BASE}/uploads/planning/${filename}`;
@@ -245,12 +245,17 @@ const Planning = () => {
             </div>
           </div>
         </main>
+        <footer className="bg-white border-t border-gray-200 py-4 text-center text-gray-500 text-sm shrink-0">
+            <p className="tracking-wide">
+              © Copyright <span className="font-bold">GAZEBO CODING 2025</span> All Rights Reserved
+            </p>
+        </footer>
       </div>
 
       {/* FAB (mobile only) */}
       <button
         onClick={() => setOpenModal(true)}
-        className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95"
+        className="md:hidden fixed bottom-5 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
         aria-label="Tambah Data"
         title="Tambah Data"
       >
