@@ -1,4 +1,5 @@
 // frontend/src/App.jsx
+import React, { useEffect } from "react"; // Tambahkan import React & useEffect
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./pages/home";
 import Login from "./pages/login";
@@ -18,10 +19,63 @@ import Video from "./pages/admin/video.jsx";
 import Foto from "./pages/admin/Foto.jsx";
 import DetailFoto from "./pages/DetailFoto";
 
-import RequireAuth from "./components/RequireAuth"; // <-- import
+import RequireAuth from "./components/RequireAuth";
 
 function App() {
   const adminRoles = ["admin", "superadmin"];
+
+  // --- TAMBAHAN LOGIKA AUTO LOGOUT (3 JAM) ---
+  useEffect(() => {
+    // 3 jam = 3 * 60 * 60 * 1000 ms
+    const SESSION_TIMEOUT = 3 * 60 * 60 * 1000; 
+
+    const checkSession = () => {
+      const lastActive = localStorage.getItem("lastActive");
+      const token = localStorage.getItem("token");
+
+      // Cek hanya jika user sedang login
+      if (token && lastActive) {
+        const now = Date.now();
+        const timeDiff = now - parseInt(lastActive, 10);
+
+        // Jika selisih waktu > 3 jam, logout paksa
+        if (timeDiff > SESSION_TIMEOUT) {
+          localStorage.clear(); // Hapus token & lastActive
+          alert("Sesi Anda telah berakhir karena tidak aktif lebih dari 3 jam. Silakan login kembali.");
+          window.location.href = "/login";
+        }
+      }
+    };
+
+    const updateActivity = () => {
+      if (localStorage.getItem("token")) {
+        localStorage.setItem("lastActive", Date.now());
+      }
+    };
+
+    // Cek saat pertama kali load
+    checkSession();
+    updateActivity();
+
+    // Cek setiap 1 menit (interval)
+    const intervalId = setInterval(checkSession, 60 * 1000);
+
+    // Reset timer jika user aktif (klik/ketik/gerak mouse)
+    window.addEventListener("click", updateActivity);
+    window.addEventListener("keypress", updateActivity);
+    window.addEventListener("mousemove", updateActivity);
+    window.addEventListener("scroll", updateActivity);
+
+    // Cleanup
+    return () => {
+      clearInterval(intervalId);
+      window.removeEventListener("click", updateActivity);
+      window.removeEventListener("keypress", updateActivity);
+      window.removeEventListener("mousemove", updateActivity);
+      window.removeEventListener("scroll", updateActivity);
+    };
+  }, []);
+  // ------------------------------------------------
 
   return (
     <Router>
@@ -32,7 +86,6 @@ function App() {
         <Route path="/actuating/video/:id" element={<DetailVideo />} />
         <Route path="/actuating/foto/:id" element={<DetailFoto />} />
 
-        {/* route untuk pengajuan akun mungkin boleh diakses admin only juga */}
         <Route
           path="/admin/pengajuan-akun"
           element={
@@ -42,7 +95,6 @@ function App() {
           }
         />
 
-        {/* contoh: semua route /admin/... dibungkus RequireAuth */}
         <Route
           path="/admin/admin"
           element={

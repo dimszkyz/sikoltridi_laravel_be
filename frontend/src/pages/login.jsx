@@ -31,6 +31,8 @@ const LoginForm = () => {
       if (response.data.user) {
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
+
+      localStorage.setItem('lastActive', Date.now());
       
       navigate('/');
       window.location.reload();
