@@ -76,18 +76,25 @@ const Planning = () => {
         const pdfHref = file.pdf_file ? PDF_URL(file.pdf_file) : null;
         return (
           <tr key={file.id} className={index % 2 === 0 ? "bg-white" : "bg-gray-50"}>
-            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
-            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">{file.title || "-"}</td>
-            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{index + 1}</td>
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{file.title || "-"}</td>
+            
+            {/* Thumbnail Center */}
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">
               {pdfHref ? (
-                <div className="flex items-center">
-                  <PdfThumb url={pdfHref} width={90} className="rounded border" />
+                <div
+                  className="inline-block rounded border overflow-hidden cursor-pointer"
+                  title="Klik untuk membuka PDF"
+                  onClick={() => window.open(pdfHref, "_blank")}
+                >
+                  <PdfThumb url={pdfHref} width={90} className="block" />
                 </div>
               ) : (
                 <span className="text-gray-500">-</span>
               )}
             </td>
-            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {pdfHref ? (
                 <a
                   href={pdfHref}
@@ -102,16 +109,18 @@ const Planning = () => {
                 <span className="text-gray-500">-</span>
               )}
             </td>
-            <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
               {formatDate(file.uploaded_at)}
             </td>
-            <td className="px-4 py-3 whitespace-nowrap text-sm font-medium">
+            
+            {/* Aksi Center */}
+            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
               <button
                 onClick={() => handleDelete(file)}
                 className="text-red-600 hover:text-red-900 rounded p-2 hover:bg-red-50"
                 title="Hapus"
               >
-                <FaTrash size={16} />
+                <FaTrash size={18} />
               </button>
             </td>
           </tr>
@@ -120,80 +129,29 @@ const Planning = () => {
     [rows]
   );
 
-  const mobileCards = useMemo(
-    () =>
-      rows.map((file) => {
-        const pdfHref = file.pdf_file ? PDF_URL(file.pdf_file) : null;
-        return (
-          <div key={file.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
-              <h3 className="text-base font-semibold text-gray-800">{file.title || "Tanpa Judul"}</h3>
-              <button
-                onClick={() => handleDelete(file)}
-                className="text-red-600 hover:text-red-700 rounded p-2 hover:bg-red-50"
-                title="Hapus"
-              >
-                <FaTrash size={16} />
-              </button>
-            </div>
-
-            <div className="mt-3">
-              {pdfHref ? (
-                <div
-                  className="rounded-lg overflow-hidden border"
-                  onClick={() => window.open(pdfHref, "_blank")}
-                  role="button"
-                  title="Buka PDF"
-                >
-                  <PdfThumb url={pdfHref} width={560} className="w-full" />
-                </div>
-              ) : (
-                <div className="h-40 rounded-lg bg-gray-100 flex items-center justify-center text-gray-400">
-                  Tidak ada PDF
-                </div>
-              )}
-            </div>
-
-            <div className="mt-3 flex items-center justify-between text-sm text-gray-600">
-              <span>Diunggah: {formatDate(file.uploaded_at)}</span>
-              {pdfHref && (
-                <a
-                  href={pdfHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-red-600 hover:text-red-700 font-medium"
-                >
-                  <FaFilePdf /> Lihat PDF
-                </a>
-              )}
-            </div>
-          </div>
-        );
-      }),
-    [rows]
-  );
-
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex min-h-screen bg-gray-100 font-sans">
       <SidebarAdmin />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header Title */}
-        <header className="sticky top-0 z-10 flex items-center justify-between bg-white/80 backdrop-blur border-b px-4 py-3">
+        <header className="flex justify-between items-center p-4 bg-white border-b">
           <h1 className="text-2xl font-semibold text-gray-800">Planning</h1>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 space-y-4">
+        <main className="flex-1 overflow-x-auto overflow-y-auto bg-gray-100 p-6 space-y-4">
           {error && (
             <p className="text-red-600 bg-red-50 border border-red-200 px-4 py-2 rounded">{error}</p>
           )}
 
           <div className="rounded-xl border border-gray-200 bg-white shadow-sm">
             
-            {/* --- HEADER CARD DENGAN GARIS HITAM --- */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-black">
-              <h2 className="text-lg font-semibold text-blue-700">Daftar Planning</h2>
+            {/* Header Card dengan Garis Hitam */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-black">
+              <h2 className="text-xl font-semibold text-blue-700">Daftar Planning</h2>
+              
+              {/* Tombol hanya muncul di Desktop (di Mobile pakai Floating Button di bawah) */}
               <button
                 onClick={() => setOpenModal(true)}
                 className="hidden md:inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 active:scale-[0.99] transition"
@@ -202,49 +160,51 @@ const Planning = () => {
               </button>
             </div>
 
-            <div className="p-4 md:p-6">
+            <div className="p-6">
               {loading ? (
                 <div className="grid place-items-center h-48 text-gray-500">Memuat data…</div>
               ) : rows.length === 0 ? (
                 <div className="grid place-items-center h-48 text-gray-500">Belum ada data.</div>
               ) : (
-                <>
-                  {/* Mobile: cards */}
-                  <div className="grid grid-cols-1 gap-4 md:hidden">{mobileCards}</div>
+                
+                // PERUBAHAN DISINI:
+                // 1. Menghilangkan div "mobileCards"
+                // 2. Menghilangkan class "hidden md:block" pada wrapper tabel
+                // 3. Memastikan "overflow-x-auto" aktif agar tabel bisa digeser
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                  <table className="min-w-full">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          No
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Judul Dokumen
+                        </th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Thumbnail
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          PDF
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Waktu Upload
+                        </th>
+                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-600 uppercase tracking-wider">
+                          Aksi
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">{bodyRows}</tbody>
+                  </table>
+                </div>
 
-                  {/* Desktop: table */}
-                  <div className="hidden md:block overflow-x-auto rounded-lg border border-gray-200">
-                    <table className="min-w-full">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            No
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Judul Dokumen
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Thumbnail
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            PDF
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Waktu Upload
-                          </th>
-                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                            Aksi
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">{bodyRows}</tbody>
-                    </table>
-                  </div>
-                </>
               )}
             </div>
           </div>
         </main>
+        
+        {/* Footer */}
         <footer className="bg-white border-t border-gray-200 py-4 text-center text-gray-500 text-sm shrink-0">
             <p className="tracking-wide">
               © Copyright <span className="font-bold">GAZEBO CODING 2025</span> All Rights Reserved
@@ -252,7 +212,7 @@ const Planning = () => {
         </footer>
       </div>
 
-      {/* --- TOMBOL MOBILE (FAB) DINAIKKAN KE ATAS (bottom-24) --- */}
+      {/* FAB Mobile Button */}
       <button
         onClick={() => setOpenModal(true)}
         className="md:hidden fixed bottom-24 right-5 h-14 w-14 rounded-full bg-blue-600 text-white shadow-lg shadow-blue-600/30 grid place-items-center active:scale-95 z-50"
